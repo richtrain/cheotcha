@@ -793,7 +793,7 @@
     { id: 'gold',   name: '욕심쟁이',    desc: '골드 획득 +8%', max: 5 },
     { id: 'revive', name: '두 번째 심지', desc: '판마다 한 번 부활', max: 1, mul: 16 }
   ];
-  const WD = 1.12, WR = (x) => Math.round(x * WD);   // 무기 피해 기본 배율
+  const WD = 1.2, WR = (x) => Math.round(x * WD);   // 무기 피해 기본 배율
   const UPS = {
     bolt:   { icon: '✦', name: '빛탄',       kind: 'w', max: 5, desc: '가까운 적을 쏘고, 맞은 자리가 터져요.',           st: (l) => '피해 ' + WR(12 + 4 * l) + ' · ' + (1 + Math.floor(l / 2)) + '발' },
     orbit:  { icon: '◎', name: '도는 불씨',   kind: 'w', max: 5, desc: '불씨가 내 주위를 돌며 닿는 적을 태워요.',   st: (l) => '피해 ' + WR(8 + 3 * l) + ' · 불씨 ' + (1 + l) + '개' },
