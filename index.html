@@ -415,6 +415,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
   const fmt = (t) => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+  const MAX_EN = 190;
   const WIN_TIME = 180, FINAL_HP = 40500, DK = 300 / 180, RESCUE_T = 150;
 
   // ---------- 화면 ----------
@@ -1843,7 +1844,7 @@
       e.cd -= dt;
       if (e.cast > 0) { e.cast -= dt; vx = vy = 0; if (e.cast <= 0) {
         for (const o of enemies) { if (!o.dead && o !== e && o.type !== 'boss' && Math.hypot(o.x - e.x, o.y - e.y) < 320) o.rageT = 4.5; }
-        const far = Math.hypot(VW, VH) / 2 + 40, a0 = rand(0, TAU); for (let i = 0; i < 3; i++) { const w = spawn('wisp', player.x + Math.cos(a0 + i * 0.25) * far, player.y + Math.sin(a0 + i * 0.25) * far); w.rageT = 4.5; }
+        const far = Math.hypot(VW, VH) / 2 + 40, a0 = rand(0, TAU); for (let i = 0; i < (enemies.length < 150 ? 3 : 0); i++) { const w = spawn('wisp', player.x + Math.cos(a0 + i * 0.25) * far, player.y + Math.sin(a0 + i * 0.25) * far); w.rageT = 4.5; }
         fx.push({ k: 'rays', x: e.x, y: e.y, R: 320, t: 0, life: 0.6, n: 20, col: '255,90,110' }); fx.push({ k: 'blast', x: e.x, y: e.y, R: 320, t: 0, life: 0.5, col: '255,90,110' });
         nums.push({ x: e.x, y: e.y - 30, v: '끼아아악!', t: -0.6, crit: true }); shake = Math.max(shake, 5); beep(1500, 0.5, 'sawtooth', 0.05, 2200);
       } }
@@ -1874,7 +1875,7 @@
         if (e.lvl >= 3) zones.push({ x: player.x + player.fx * 120, y: player.y + player.fy * 120, r: 70, t: 0, delay: 1.45, dmg: e.dmg * 1.3 });
         e.slamT = Math.max(4.5, 7.5 - e.lvl * 0.5);
       }
-      if (e.lvl >= 3 && e.sumT <= 0) { for (let i = 0; i < 4; i++) spawn('wisp', e.x + rand(-50, 50), e.y + rand(-50, 50)); e.sumT = 9; }
+      if (e.lvl >= 3 && e.sumT <= 0) { if (enemies.length < 150) for (let i = 0; i < 4; i++) spawn('wisp', e.x + rand(-50, 50), e.y + rand(-50, 50)); e.sumT = 9; }
       if (e.final) {
         const rage = e.hp < e.maxHp * 0.5;
         if (rage && !e.raged) { e.raged = true; banner('☠ 분노! ☠'); shake = 14; e.speed *= 1.25; beep(80, 0.8, 'sawtooth', 0.08, 40); }
@@ -2791,6 +2792,12 @@
       }
     }
     if (enemies.some((e) => e.dead)) enemies = enemies.filter((e) => !e.dead);
+    if (enemies.length > MAX_EN) {
+      const R2 = (VW * VW + VH * VH) / 4, cand = [];
+      for (const e of enemies) { if (e.type === 'boss' || e.gold || e.elite || e.final || e.lock || e.keep || e.infected) continue; const d2 = (e.x - player.x) ** 2 + (e.y - player.y) ** 2; if (d2 > R2) cand.push([d2, e]); }
+      cand.sort((p, q) => q[0] - p[0]); const cut = new Set(cand.slice(0, enemies.length - MAX_EN).map((p) => p[1]));
+      if (cut.size) enemies = enemies.filter((e) => !cut.has(e));
+    }
     if (fx.length > 480) { let over = fx.length - 360, w = 0; for (let i = 0; i < fx.length; i++) { const f = fx[i]; if (over > 0 && (f.k === 'p' || f.k === 'puff' || f.k === 'dust' || f.k === 'corpse')) { over--; continue; } fx[w++] = f; } fx.length = w; }
 
     // 적 탄환, 위험 지대
