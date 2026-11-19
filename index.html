@@ -3,7 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>좀비대탈출</title>
+<title>좀비대탈출 - 서울 좀비 생존 게임</title>
+<meta name="description" content="동료를 구하고 3분 뒤 첫차까지 버텨라! 설치 없이 바로 하는 서울 배경 좀비 생존 게임. 장소별 미션, 용병, 랭킹에 도전하세요.">
+<meta name="keywords" content="좀비대탈출, 좀비게임, 무료게임, 웹게임, 브라우저게임, 생존게임, 서바이벌, 뱀서라이크">
+<link rel="canonical" href="https://zombie.jj365.kr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="좀비대탈출">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:url" content="https://zombie.jj365.kr/">
+<meta property="og:title" content="좀비대탈출 - 서울 좀비 생존 게임">
+<meta property="og:description" content="동료를 구하고 3분 뒤 첫차까지 버텨라! 설치 없이 바로 플레이 · 랭킹 도전">
+<meta property="og:image" content="https://zombie.jj365.kr/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="좀비대탈출 - 좀비 떼 사이에서 버티는 생존자들">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="좀비대탈출 - 서울 좀비 생존 게임">
+<meta name="twitter:description" content="동료를 구하고 3분 뒤 첫차까지 버텨라!">
+<meta name="twitter:image" content="https://zombie.jj365.kr/og.jpg">
+<meta name="theme-color" content="#05060e">
 <style>
   :root { --warm: #ffcf7a; --ink: #05060e; --line: rgba(255,225,170,.2); --text: #f5eedf; --dim: rgba(245,238,223,.7); --cyan: #8fe9ff; }
   * { box-sizing: border-box; }
@@ -14,9 +32,12 @@
   .hidden { display: none !important; }
   #pauseBtn, #gearBtn { position: absolute; z-index: 30; width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(255,215,140,.45); background: rgba(14,16,34,.8);
     color: #fff4d6; font-size: 16px; display: grid; place-items: center; cursor: pointer; pointer-events: auto; padding: 0; }
-  #gearBtn { position: fixed; top: 12px; right: 12px; font-size: 19px; }
-  #rankBtn { position: fixed; top: 12px; left: 12px; z-index: 30; height: 38px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(255,215,140,.45); background: rgba(14,16,34,.8); color: #ffd98a; font: inherit; font-size: 14px; font-weight: 800; letter-spacing: 1px; cursor: pointer; }
-  #rankBtn.hidden { display: none; }
+  #gearBtn { position: fixed; top: 12px; right: max(12px, calc(50% - 386px)); font-size: 19px; }
+  #rankBtn, #shareBtn { position: fixed; top: 12px; left: max(12px, calc(50% - 386px)); z-index: 30; height: 38px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(255,215,140,.45); background: rgba(14,16,34,.8); color: #ffd98a; font: inherit; font-size: 14px; font-weight: 800; letter-spacing: 1px; cursor: pointer; }
+  #shareBtn { top: 56px; font-size: 13px; padding: 0 12px; height: 34px; color: #aef0ff; border-color: rgba(120,230,255,.45); }
+  #rankBtn.hidden, #shareBtn.hidden { display: none; }
+  @media (max-width: 860px) { #shareBtn { top: 12px; height: 38px; left: 106px; } .menuBox { padding-top: 40px; } }
+  #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); z-index: 60; padding: 10px 16px; border-radius: 12px; background: rgba(14,16,34,.94); border: 1px solid rgba(255,215,140,.45); color: #ffe9b8; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; white-space: nowrap; } #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .misHead { margin: 10px 4px 0; font-size: 13px; letter-spacing: 1px; color: #e8dcc0; } .misHead b { color: var(--warm); } .misHead em { font-style: normal; color: #9aa3b5; margin-left: 6px; font-size: 12px; }
   .card.merc .lk { font-size: 11px; color: #9aa3b5; }
   .misList { display: grid; gap: 6px; margin: 6px 4px 2px; } .misList div { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,215,140,.16); font-size: 13px; color: var(--text); } .misList div.ok { opacity: .55; } .misList b { color: var(--warm); margin-left: auto; font-size: 12px; white-space: nowrap; } .misList i { font-style: normal; width: 18px; text-align: center; }
@@ -311,6 +332,8 @@
   </div>
   <button id="gearBtn" aria-label="소리 설정">⚙</button>
   <button id="rankBtn" aria-label="랭킹">🏆 랭킹</button>
+  <button id="shareBtn" aria-label="친구에게 공유하기">📤 친구 초대</button>
+  <div id="toast"></div>
   <div id="callOv" class="hidden"><div class="cc"><canvas id="callCv" width="144" height="144"></canvas><div><div class="rd"><i></i>무전 수신 중…</div><div class="ln" id="callLn"></div><div class="hn" id="callHn"></div></div></div></div>
   <div id="pauseOv" class="panel over hidden">
     <div class="box">
@@ -2922,6 +2945,14 @@
   const rkStep = (d) => { const i = STAGES.findIndex((x) => x.id === RK.sid); RK.sid = STAGES[(i + d + STAGES.length) % STAGES.length].id; rkRender(); rkFetch(RK.sid); };
   $('rkPrev').addEventListener('click', () => rkStep(-1)); $('rkNext').addEventListener('click', () => rkStep(1));
   $('rankBtn').addEventListener('click', (e) => { e.stopPropagation(); rkOpen(meta.sel.stage); });
+  let toastT = 0; function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2600); }
+  $('shareBtn').addEventListener('click', async (e) => {
+    e.stopPropagation(); initAudio();
+    const url = 'https://zombie.jj365.kr/', title = '좀비대탈출', text = '🧟 좀비대탈출 같이 하자! 동료 구하고 첫차까지 버티는 서울 좀비 생존 게임' + ((meta.stats || {}).bestAny ? ' · 내 최고 생존 ' + fmt(meta.stats.bestAny) : '');
+    if (navigator.share) { try { await navigator.share({ title, text, url }); return; } catch (err) { if (err && err.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(text + '\n' + url); toast('링크를 복사했어요! 카톡에 붙여넣어 친구를 불러 보세요'); }
+    catch (err) { window.prompt('이 주소를 복사해서 친구에게 보내 주세요', url); }
+  });
   function rkShowEnd(sid, rec) {
     const box = $('rankBox'); box.innerHTML = '';
     const view = () => { const b = document.createElement('button'); b.className = 'rkLink'; b.textContent = '🏆 랭킹 보기'; b.onclick = () => rkOpen(sid); box.appendChild(b); };
@@ -2985,7 +3016,7 @@
   function endCall() { if (state !== 'call') return; $('callOv').classList.add('hidden'); state = 'play'; prev = performance.now(); }
   $('callOv').addEventListener('click', endCall);
   function startRun() {
-    initAudio(); newRun(); state = 'play'; $('gearBtn').classList.add('hidden'); $('rankBtn').classList.add('hidden'); showCall();
+    initAudio(); newRun(); state = 'play'; $('gearBtn').classList.add('hidden'); $('rankBtn').classList.add('hidden'); $('shareBtn').classList.add('hidden'); showCall();
     $('menu').classList.add('hidden'); $('over').classList.add('hidden'); $('levelup').classList.add('hidden'); $('hud').classList.remove('hidden');
   }
   let pausedFrom = null;
@@ -3014,7 +3045,7 @@
   const onHide = () => { if (state === 'play') pauseGame(true); if (ac && ac.state === 'running') ac.suspend(); };
   document.addEventListener('visibilitychange', () => { if (document.hidden) onHide(); else if (ac && ac.state === 'suspended') ac.resume(); });
   window.addEventListener('pagehide', onHide);
-  function toMenu() { $('callOv').classList.add('hidden'); state = 'menu'; $('gearBtn').classList.remove('hidden'); $('rankBtn').classList.remove('hidden'); renderMenu(); $('over').classList.add('hidden'); $('hud').classList.add('hidden'); $('menu').classList.remove('hidden'); }
+  function toMenu() { $('callOv').classList.add('hidden'); state = 'menu'; $('gearBtn').classList.remove('hidden'); $('rankBtn').classList.remove('hidden'); $('shareBtn').classList.remove('hidden'); renderMenu(); $('over').classList.add('hidden'); $('hud').classList.add('hidden'); $('menu').classList.remove('hidden'); }
   document.querySelectorAll('.railBtn').forEach((b) => b.addEventListener('click', () => { const r = $(b.dataset.r); r.scrollBy({ left: (b.classList.contains('l') ? -1 : 1) * r.clientWidth * 0.8, behavior: 'smooth' }); }));
   $('startBtn').addEventListener('click', startRun);
   $('againBtn').addEventListener('click', startRun);
