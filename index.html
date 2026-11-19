@@ -1167,13 +1167,13 @@
       if (s.stats) { Object.assign(meta.stats, s.stats); meta.stats.best = s.stats.best || {}; meta.stats.wins = s.stats.wins || {}; }
       if (s.bestTime) meta.stats.bestAny = Math.max(meta.stats.bestAny, s.bestTime);
       if (s.sel) Object.assign(meta.sel, s.sel);
-      Object.assign(meta.own, s.own || {}); meta.legacy = s.legacy || []; if (s.disc) meta.disc = s.disc; if (s.shops) meta.shops = s.shops; if (s.mis) meta.mis = s.mis; if (s.merc) meta.merc = s.merc; if (s.items) meta.items = s.items;
+      Object.assign(meta.own, s.own || {}); meta.legacy = s.legacy || []; if (s.disc) meta.disc = s.disc; if (s.shops) meta.shops = s.shops; if (s.mis) meta.mis = s.mis; if (s.merc) meta.merc = s.merc; if (s.items) meta.items = s.items; if (s.gifts) meta.gifts = s.gifts;
       if (!s.items) meta.items = { revive: (meta.up.revive || 0) * 3, reroll: (meta.up.reroll || 0) * 5 }; meta.up.revive = 0; meta.up.reroll = 0;
       if (!s.v2) { const o = { grave: 'forest', ice: 'grave', lava: 'ice' }; for (const k in o) if ((meta.stats.best[o[k]] || 0) >= 210 && !meta.legacy.includes(k)) meta.legacy.push(k); }
     }
   } catch (e) {} }
   applySave(saveRaw);
-  if (!saveRaw) IDB((st) => { const q = st.get('meta'); q.onsuccess = () => { if (q.result && state === 'menu') { applySave(q.result); try { localStorage.setItem('lanternMeta', q.result); } catch (e) {} renderMenu(); } }; });
+  if (!saveRaw) IDB((st) => { const q = st.get('meta'); q.onsuccess = () => { if (q.result && state === 'menu') { applySave(q.result); try { localStorage.setItem('lanternMeta', q.result); } catch (e) {} if (window.__gift) window.__gift(); renderMenu(); } }; });
   function saveMeta() { const v = JSON.stringify(meta); try { localStorage.setItem('lanternMeta', v); } catch (e) {} IDB((st) => st.put(v, 'meta')); }
   const ITM = (k) => ((meta.items || {})[k] || 0);
   const ITEMS = [{ id: 'revive', name: '비상 구급함', desc: '쓰러지면 한 번 다시 일어나요 · 쓰면 사라져요', cost: 1500 }, { id: 'reroll', name: '다시 뽑기', desc: '레벨업 선택지를 한 번 다시 뽑아요 · 쓰면 사라져요', cost: 300 }];
@@ -2920,6 +2920,10 @@
   const FB = { key: 'AIzaSyCYvBQaVdAkWvkyBl366lea37IUhMt5NX4', pid: 'zombie-escape-23328' };
   const RK = { ok: !!(FB.key && FB.pid), rows: {}, err: false, sid: null, pid: null };
   try { RK.pid = localStorage.getItem('cheotcha_pid'); if (!RK.pid) { RK.pid = 'p' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('cheotcha_pid', RK.pid); } } catch (e) { RK.pid = 'p' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  // 운영 선물: 받을 사람(기기 ID), 한 번만 지급
+  const GIFTS = [{ id: 'rank1', amt: 5000, msg: '🎁 랭커 감사 선물! 5,000 골드를 받았어요', to: ['prftkt49us1mwncwvui', 'pwoblum1d1chmwnf9a6k', 'pivahxwl4m0gmwncrgx1'] }];
+  window.__gift = () => { for (const G of GIFTS) { meta.gifts = meta.gifts || {}; if (meta.gifts[G.id] || !G.to.includes(RK.pid)) continue; meta.gifts[G.id] = 1; meta.coins += G.amt; saveMeta(); setTimeout(() => { try { toast(G.msg); initAudio(); beep(880, 0.15, 'triangle', 0.05, 1320); } catch (e) {} if (state === 'menu') renderMenu(); }, 900); } };
+  window.__gift();
   const rkKey = (e) => e.w ? e.t : 100000 - e.t;
   const rkFmt = (e) => (e.w ? '클리어 ' : '생존 ') + fmt(e.t);
   const fbDocs = 'https://firestore.googleapis.com/v1/projects/' + FB.pid + '/databases/(default)/documents';
