@@ -2762,23 +2762,24 @@
   const coinsNow = () => Math.floor((Math.floor(run.t * DK / 10 * run.st.coinMul) + run.bossKills * 10 + (run.bonus || 0)) * (1 + 0.08 * (meta.up.gold || 0) + SV('m_imp')));
 
   // ---------- 랭킹: 장소별 10등까지 (클리어가 먼저, 빠른 순 · 못 깼으면 오래 버틴 순) ----------
-  // Supabase 프로젝트 주소와 공개용(anon) 키. 비어 있으면 이 기기 기록만 씀
-  const SB = { url: '', key: '' };
-  const RK = { ok: !!(SB.url && SB.key), rows: {}, err: false, sid: null, pid: null };
+  // Firebase(Firestore) 공개용 웹 키와 프로젝트 ID. 비어 있으면 이 기기 기록만 씀
+  const FB = { key: 'AIzaSyCYvBQaVdAkWvkyBl366lea37IUhMt5NX4', pid: 'zombie-escape-23328' };
+  const RK = { ok: !!(FB.key && FB.pid), rows: {}, err: false, sid: null, pid: null };
   try { RK.pid = localStorage.getItem('cheotcha_pid'); if (!RK.pid) { RK.pid = 'p' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('cheotcha_pid', RK.pid); } } catch (e) { RK.pid = 'p' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
   const rkKey = (e) => e.w ? e.t : 100000 - e.t;
   const rkFmt = (e) => (e.w ? '클리어 ' : '생존 ') + fmt(e.t);
-  const sbH = () => ({ apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'Content-Type': 'application/json' });
+  const fbDocs = 'https://firestore.googleapis.com/v1/projects/' + FB.pid + '/databases/(default)/documents';
+  const fbVal = (f) => !f ? undefined : 'stringValue' in f ? f.stringValue : 'booleanValue' in f ? f.booleanValue : 'integerValue' in f ? Number(f.integerValue) : 'doubleValue' in f ? f.doubleValue : undefined;
   function rkLocal() { try { return JSON.parse(localStorage.getItem('cheotcha_rank') || '{}') || {}; } catch (e) { return {}; } }
   const rkOnline = (sid) => RK.ok && !RK.err && !!RK.rows[sid];
   async function rkFetch(sid) {
     if (!RK.ok) return;
     try {
-      const base = SB.url.replace(/\/$/, '') + '/rest/v1/ranks?select=player,nick,won,t,lv,ch&stage=eq.' + encodeURIComponent(sid);
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-      const [a, b] = await Promise.all([fetch(base + '&won=eq.true&order=t.asc&limit=300', { headers: sbH(), signal: ctl.signal }), fetch(base + '&won=eq.false&order=t.desc&limit=300', { headers: sbH(), signal: ctl.signal })]);
-      clearTimeout(to); if (!a.ok || !b.ok) throw new Error('http');
-      RK.rows[sid] = (await a.json()).concat(await b.json()).filter((r) => r && typeof r.t === 'number' && typeof r.nick === 'string').map((r) => ({ n: r.nick, w: r.won ? 1 : 0, t: r.t, lv: r.lv, ch: r.ch, pl: r.player, me: r.player === RK.pid }));
+      const q = { structuredQuery: { from: [{ collectionId: 'ranks' }], where: { fieldFilter: { field: { fieldPath: 'stage' }, op: 'EQUAL', value: { stringValue: sid } } }, limit: 1000 } };
+      const res = await fetch(fbDocs + ':runQuery?key=' + FB.key, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(q), signal: ctl.signal });
+      clearTimeout(to); if (!res.ok) throw new Error('http');
+      RK.rows[sid] = (await res.json()).filter((x) => x && x.document && x.document.fields).map((x) => { const f = x.document.fields, g = (k) => fbVal(f[k]); return { n: g('nick'), w: g('won') ? 1 : 0, t: g('t'), lv: g('lv'), ch: g('ch'), pl: g('player'), me: g('player') === RK.pid }; }).filter((r) => typeof r.t === 'number' && typeof r.n === 'string');
       RK.err = false;
     } catch (e) { RK.err = true; }
     rkRender();
@@ -2800,7 +2801,9 @@
     try { const L = rkLocal(); L[sid] = (L[sid] || []).concat([rec]).sort((a, b) => rkKey(a) - rkKey(b)).slice(0, 10); localStorage.setItem('cheotcha_rank', JSON.stringify(L)); } catch (e) {}
     if (RK.ok) {
       try {
-        const r = await fetch(SB.url.replace(/\/$/, '') + '/rest/v1/ranks', { method: 'POST', headers: Object.assign(sbH(), { Prefer: 'return=minimal' }), body: JSON.stringify({ stage: sid, player: RK.pid, nick, won: !!rec.w, t: rec.t, lv: rec.lv || 1, ch: rec.ch || null }) });
+        const fl = { stage: { stringValue: sid }, player: { stringValue: RK.pid }, nick: { stringValue: nick }, won: { booleanValue: !!rec.w }, t: { integerValue: String(Math.max(5, Math.min(3600, Math.round(rec.t)))) }, lv: { integerValue: String(Math.max(1, Math.min(999, rec.lv || 1))) } };
+        if (rec.ch) fl.ch = { stringValue: String(rec.ch).slice(0, 20) };
+        const r = await fetch(fbDocs + '/ranks/' + encodeURIComponent(sid + '_' + RK.pid) + '?key=' + FB.key, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: fl }) });
         if (r.ok) { rkFetch(sid); return 'global'; }
       } catch (e) {}
     }
