@@ -17,6 +17,8 @@
   #gearBtn { position: fixed; top: 12px; right: 12px; font-size: 19px; }
   #rankBtn { position: fixed; top: 12px; left: 12px; z-index: 30; height: 38px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(255,215,140,.45); background: rgba(14,16,34,.8); color: #ffd98a; font: inherit; font-size: 14px; font-weight: 800; letter-spacing: 1px; cursor: pointer; }
   #rankBtn.hidden { display: none; }
+  .misHead { margin: 10px 4px 0; font-size: 13px; letter-spacing: 1px; color: #e8dcc0; } .misHead b { color: var(--warm); } .misHead em { font-style: normal; color: #9aa3b5; margin-left: 6px; font-size: 12px; }
+  .card.merc .lk { font-size: 11px; color: #9aa3b5; }
   .misList { display: grid; gap: 6px; margin: 6px 4px 2px; } .misList div { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,215,140,.16); font-size: 13px; color: var(--text); } .misList div.ok { opacity: .55; } .misList b { color: var(--warm); margin-left: auto; font-size: 12px; white-space: nowrap; } .misList i { font-style: normal; width: 18px; text-align: center; }
   #misBox { margin: 6px 0 2px; font-size: 13px; color: #ffd98a; } #misBox div { margin: 2px 0; }
   .card.merc { cursor: default; } .card.merc .mb { display: flex; gap: 6px; justify-content: center; margin-top: 6px; } .card.merc .mb button { font: inherit; font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 999px; border: 1px solid rgba(255,210,120,.5); background: rgba(255,190,90,.12); color: #ffd98a; cursor: pointer; } .card.merc .mb button:disabled { opacity: .4; cursor: default; } .card.merc.on { border-color: rgba(120,230,255,.8); box-shadow: 0 0 18px rgba(120,230,255,.25); } .card.merc .mb button.go { background: rgba(120,230,255,.15); border-color: rgba(120,230,255,.6); color: #aef0ff; }
@@ -333,7 +335,7 @@
         <div id="showR"><div class="wlab" id="wlab"></div><div class="wroad" id="wroad"></div><button class="btn big" id="startBtn">▶ 시작</button></div>
       </div>
       <h3>캐릭터 <em id="charCnt"></em></h3><div class="railWrap"><button class="railBtn l" data-r="chars">‹</button><div class="rail" id="chars"></div><button class="railBtn r" data-r="chars">›</button></div>
-      <h3>장소 <em id="stageCnt"></em></h3><div class="railWrap"><button class="railBtn l" data-r="stages">‹</button><div class="rail" id="stages"></div><button class="railBtn r" data-r="stages">›</button></div><div class="misList" id="misList"></div>
+      <h3>장소 <em id="stageCnt"></em></h3><div class="railWrap"><button class="railBtn l" data-r="stages">‹</button><div class="rail" id="stages"></div><button class="railBtn r" data-r="stages">›</button></div><div class="misHead" id="misHead"></div><div class="misList" id="misList"></div>
       <h3>남대문시장 재건 <span id="mktCnt"></span></h3><div class="railWrap"><button class="railBtn l" data-r="mkt">‹</button><div class="rail" id="mkt"></div><button class="railBtn r" data-r="mkt">›</button></div>
       <h3>용병 <span>골드로 고용하고, 한 명을 데려가요</span></h3><div class="railWrap"><button class="railBtn l" data-r="mercs">‹</button><div class="rail" id="mercs"></div><button class="railBtn r" data-r="mercs">›</button></div>
       <h3>영구 강화 <span>골드로 영원히 강해져요</span></h3><div class="railWrap"><button class="railBtn l" data-r="shop">‹</button><div class="rail" id="shop"></div><button class="railBtn r" data-r="shop">›</button></div>
@@ -437,6 +439,7 @@
     ['neww', 4, 3, 120, ['cart', 'cartb', 'cart2', 'cart3', 'ospray', 'osprayb', 'ospray2', 'ospray3', 'kick', 'kickb', 'kick2', 'kick3'], { cut: 70 }],
     ['sigw', 4, 3, 120, ['ev', 'evb', 'ev2', 'ev3', 'oil', 'oilb', 'oil2', 'oil3', 'hwatu', 'hwatub', 'hwatu2', 'hwatu3'], { cut: 70 }],
     ['muskman', 4, 3, 150, ['musk_d0', 'musk_d1', 'musk_d2', 'musk_d3', 'musk_u0', 'musk_u1', 'musk_u2', 'musk_u3', 'musk_s0', 'musk_s1', 'musk_s2', 'musk_s3'], { row: true, cut: 70 }],
+    ...['guard', 'hunter', 'medic', 'fire', 'tkd', 'weld'].map((k) => ['merc_' + k, 4, 4, 150, ['d', 'u', 's', 'a'].flatMap((r) => [0, 1, 2, 3].map((i) => 'm' + k + '_' + r + i)), { row: true, cut: 70 }]),
     ['kangman', 4, 3, 150, ['kang_d0', 'kang_d1', 'kang_d2', 'kang_d3', 'kang_u0', 'kang_u1', 'kang_u2', 'kang_u3', 'kang_s0', 'kang_s1', 'kang_s2', 'kang_s3'], { row: true, cut: 70 }],
     ['goniman', 4, 3, 150, ['goni_d0', 'goni_d1', 'goni_d2', 'goni_d3', 'goni_u0', 'goni_u1', 'goni_u2', 'goni_u3', 'goni_s0', 'goni_s1', 'goni_s2', 'goni_s3'], { row: true, cut: 70 }],
     ['tiers4', 4, 4, 130, ['bolt4', 'bolt5', 'zap4', 'zap5', 'ember4', 'ember5', 'blade4', 'blade5', 'boomer4', 'boomer5', 'ice4', 'ice5', 'meteor4', 'meteor5', 'shur4', 'shur5'], { cut: 115 }],
@@ -1309,6 +1312,7 @@
       sb.appendChild(b);
     }
     { const st = STAGES.find((x) => x.id === meta.sel.stage) || STAGES[0], dn = (meta.mis || {})[st.id] || [];
+      $('misHead').innerHTML = '🎯 <b>' + st.name + '</b> 미션 <em>' + dn.filter(Boolean).length + ' / 3</em>';
       $('misList').innerHTML = misOf(st).map((m, i) => '<div class="' + (dn[i] ? 'ok' : '') + '"><i>' + (dn[i] ? '✅' : '🎯') + '</i>' + m.txt + '<b>' + (dn[i] ? '달성' : GC + ' ' + m.r) + '</b></div>').join(''); }
     renderMercs();
     { const mk = $('mkt'); mk.innerHTML = ''; let open = 0;
@@ -2014,19 +2018,24 @@
     }
   }
   const MERCS = [
-    { id: 'guard', name: '경비원 박씨', sp: 'sm', role: '근접 · 맷집', cost: 300, d: (lv) => '곁에 붙은 좀비를 휘둘러 베어요 · 피해 ×' + (1 + 0.25 * (lv - 1)).toFixed(2), hp: 320 },
-    { id: 'hunter', name: '사냥꾼 김씨', sp: 'wind', role: '원거리', cost: 450, d: (lv) => '좀비가 몰린 쪽으로 화살을 쏴요 · 피해 ×' + (1 + 0.25 * (lv - 1)).toFixed(2), hp: 170 },
-    { id: 'medic', name: '구급대원 이씨', sp: 'sage', role: '회복', cost: 600, d: (lv) => '6초마다 체력 ' + (3 + lv) + '% 회복 · 약한 공격', hp: 200 }];
+    { id: 'guard', name: '경비원 박씨', role: '근접 · 맷집', cost: 300, kind: 'melee', hp: 320, d: (lv) => '곤봉을 내리찍어 주변 좀비를 쓸어요 · 피해 ×' + (1 + 0.25 * (lv - 1)).toFixed(2) },
+    { id: 'hunter', name: '사냥꾼 김씨', role: '원거리', cost: 450, kind: 'shoot', hp: 170, d: (lv) => '좀비가 몰린 쪽으로 화살을 쏴요 · 피해 ×' + (1 + 0.25 * (lv - 1)).toFixed(2) },
+    { id: 'medic', name: '구급대원 이씨', role: '회복', cost: 600, kind: 'heal', hp: 200, d: (lv) => '6초마다 치료 스프레이로 체력 ' + (3 + lv) + '% 회복' },
+    { id: 'fire', name: '소방관 최씨', role: '근접 · 광역', cost: 900, kind: 'melee', hp: 420, soon: true, d: () => '도끼를 크게 휘둘러 불꽃을 터뜨려요' },
+    { id: 'tkd', name: '태권도 사범 정씨', role: '근접 · 연타', cost: 900, kind: 'melee', hp: 260, soon: true, d: () => '빠른 발차기로 쉴 새 없이 때려요' },
+    { id: 'weld', name: '용접공 오씨', role: '화염', cost: 1100, kind: 'shoot', hp: 240, soon: true, d: () => '용접 불꽃으로 앞쪽을 지져요' }];
+  const mSp = (m) => 'm' + m.id;
   const mercCost = (m, lv) => lv ? Math.round(m.cost * 0.6 * Math.pow(1.6, lv - 1)) : m.cost;
   function renderMercs() {
     meta.merc = meta.merc || { own: {}, sel: null }; const box = $('mercs'); if (!box) return; box.innerHTML = '';
     for (const m of MERCS) {
       const lv = meta.merc.own[m.id] || 0, on = meta.merc.sel === m.id, cost = mercCost(m, lv), maxed = lv >= 5;
-      const b = document.createElement('div'); b.className = 'card merc' + (on ? ' on' : '') + (lv ? '' : ' shut');
+      const b = document.createElement('div'); b.className = 'card merc' + (on ? ' on' : '') + (lv ? '' : ' shut') + (m.soon ? ' lock' : '');
       const cv = document.createElement('canvas'); cv.width = cv.height = 144; const g = cv.getContext('2d');
-      if (ART.ready && ART.s[m.sp + '_d0']) { g.translate(72, 118); g.scale(3.6, 3.6); if ('filter' in g) g.filter = 'hue-rotate(160deg) saturate(.8)'; const hd0 = HD; HD = 'd'; drawHero(g, m.sp, 0, 0, 1, 0, false); HD = hd0; }
+      if (ART.ready && ART.s[mSp(m) + '_d0']) { g.translate(72, 118); g.scale(3.6, 3.6); if (m.soon && 'filter' in g) g.filter = 'brightness(0.18)'; const hd0 = HD; HD = 'd'; drawHero(g, mSp(m), 0, 0, 1, 0, false); HD = hd0; }
       b.appendChild(cv);
       b.insertAdjacentHTML('beforeend', '<div class="sh">' + m.role + (lv ? ' · Lv ' + lv : '') + '</div><div class="n">' + m.name + '</div><div class="d">' + m.d(Math.max(1, lv)) + '</div>');
+      if (m.soon) { b.insertAdjacentHTML('beforeend', '<div class="mb"><span class="lk">🔒 곧 합류해요</span></div>'); box.appendChild(b); continue; }
       const mb = document.createElement('div'); mb.className = 'mb';
       const buy = document.createElement('button'); buy.innerHTML = !lv ? GC + ' ' + cost + ' 고용' : maxed ? '최대' : GC + ' ' + cost + ' 강화'; buy.disabled = maxed || meta.coins < cost;
       buy.addEventListener('click', (e) => { e.stopPropagation(); if (maxed || meta.coins < cost) return; meta.coins -= cost; meta.merc.own[m.id] = lv + 1; if (!lv) meta.merc.sel = m.id; saveMeta(); initAudio(); beep(700, 0.12, 'sine', 0.05, 1100); renderMenu(); });
@@ -2036,9 +2045,9 @@
     }
   }
   function makeMerc() {
-    const mm = meta.merc || {}, m = MERCS.find((x) => x.id === mm.sel), lv = m && (mm.own || {})[m.id]; if (!m || !lv) return null;
+    const mm = meta.merc || {}, m = MERCS.find((x) => x.id === mm.sel), lv = m && (mm.own || {})[m.id]; if (!m || !lv || m.soon) return null;
     const hp = m.hp * (1 + 0.2 * (lv - 1));
-    return { m, lv, k: 1 + 0.25 * (lv - 1), x: player.x + 40, y: player.y + 16, hp, maxHp: hp, cd: 0.8, heal: 6, st: 'free', downT: 0, face: 1, moveT: 0, moving: false, hd: 'd', sw: 0 };
+    return { m, lv, atk: 0, k: 1 + 0.25 * (lv - 1), x: player.x + 40, y: player.y + 16, hp, maxHp: hp, cd: 0.8, heal: 6, st: 'free', downT: 0, face: 1, moveT: 0, moving: false, hd: 'd', sw: 0 };
   }
   function updateMerc(dt, dm) {
     const M = run.merc; if (!M) return;
@@ -2048,28 +2057,31 @@
     else if (d > 26) { const sp = (d > 160 ? 330 : 215) * dt, k = Math.min(1, sp / d); M.x += dx * k; M.y += dy * k; M.moving = true; M.moveT += dt; M.face = dx >= 0 ? 1 : -1; M.hd = Math.abs(dy) > Math.abs(dx) * 1.25 ? (dy > 0 ? 'd' : 'u') : 's'; }
     else M.moving = false;
     if (M.sw > 0) M.sw -= dt;
-    M.cd -= dt; const id = M.m.id;
+    if (M.hit > 0) { M.hit -= dt; if (M.hit <= 0) { splash(M.x + M.face * 30, M.y, 88, (18 + run.lvl * 2) * dm * M.k, { kb: 170, col: '255,220,160' }); M.sw = 0.25; } }
+    M.cd -= dt; const id = M.m.id; if (M.atk > 0) M.atk -= dt;
     if (M.cd <= 0) {
-      if (id === 'guard') {
+      if (M.m.kind === 'melee') {
         let near = null, bd = 95; for (const e of enemies) { if (e.dead || e.gold) continue; const q = Math.hypot(e.x - M.x, e.y - M.y); if (q < bd) { bd = q; near = e; } }
-        if (near) { M.face = near.x >= M.x ? 1 : -1; splash(M.x, M.y, 88, (18 + run.lvl * 2) * dm * M.k, { kb: 170, col: '255,220,160' }); M.sw = 0.25; M.cd = 0.8; } else M.cd = 0.15;
+        if (near) { M.face = near.x >= M.x ? 1 : -1; M.atk = 0.42; M.hit = 0.2; M.cd = 0.85; } else M.cd = 0.15;
       } else {
         const tg = nearest(1, id === 'hunter' ? 480 : 360)[0];
         if (tg) { const a = Math.atan2(tg.y - M.y, tg.x - M.x), n = id === 'hunter' ? (run.t > 90 ? 3 : 2) : 1;
           for (let i = 0; i < n; i++) { const aa = a + (i - (n - 1) / 2) * 0.16; bullets.push({ x: M.x, y: M.y - 6, vx: Math.cos(aa) * 520, vy: Math.sin(aa) * 520, r: 7, dmg: (id === 'hunter' ? 13 + run.lvl * 1.5 : 7 + run.lvl * 0.8) * dm * M.k, pierce: id === 'hunter' ? 2 : 0, life: 1, hit: [], s: 'bolt', sz: 26, col: id === 'hunter' ? '255,230,150' : '150,255,190' }); }
-          if (!M.moving) M.face = tg.x >= M.x ? 1 : -1; M.cd = id === 'hunter' ? 0.55 : 1.1; } else M.cd = 0.2;
+          M.face = tg.x >= M.x ? 1 : -1; if (id === 'hunter') M.atk = 0.42; M.cd = id === 'hunter' ? 0.55 : 1.1; } else M.cd = 0.2;
       }
     }
-    if (id === 'medic') { M.heal -= dt; if (M.heal <= 0) { M.heal = 6; const h = player.maxHp * (0.03 + 0.01 * M.lv); if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + h); nums.push({ x: player.x, y: player.y - 30, v: '+' + Math.round(h), t: 0, heal: true }); fx.push({ k: 'pillar', x: player.x, y: player.y, w: 40, t: 0, life: 0.5, col: '150,255,190' }); } } }
+    if (id === 'medic') { M.heal -= dt; if (M.heal <= 0) { M.heal = 6; M.atk = 0.42; M.face = player.x >= M.x ? 1 : -1; const h = player.maxHp * (0.03 + 0.01 * M.lv); if (player.hp < player.maxHp) { player.hp = Math.min(player.maxHp, player.hp + h); nums.push({ x: player.x, y: player.y - 30, v: '+' + Math.round(h), t: 0, heal: true }); fx.push({ k: 'pillar', x: player.x, y: player.y, w: 40, t: 0, life: 0.5, col: '150,255,190' }); } } }
     for (const e of enemies) { if (e.dead || e.gold) continue; if (Math.hypot(e.x - M.x, e.y - M.y) < e.r + 12) M.hp -= e.dmg * (id === 'guard' ? 0.35 : 0.55) * dt; }
     M.hp = Math.min(M.maxHp, M.hp + 2 * dt);
     if (M.hp <= 0) { M.st = 'down'; M.downT = 8; M.hp = 0; nums.push({ x: M.x, y: M.y - 40, v: '용병 쓰러짐', t: -0.6 }); }
   }
   function drawMerc() {
     const M = run && run.merc; if (!M || state === 'menu') return;
-    const hd0 = HD; HD = M.hd;
-    ctx.save(); if (M.st === 'down') ctx.globalAlpha = 0.45; if ('filter' in ctx) ctx.filter = 'hue-rotate(160deg) saturate(.8)';
-    drawHero(ctx, M.m.sp, M.x, M.y, M.face, M.moveT, M.moving); ctx.restore(); HD = hd0;
+    const hd0 = HD, sp = mSp(M.m); HD = M.hd;
+    ctx.save(); if (M.st === 'down') ctx.globalAlpha = 0.45;
+    if (M.atk > 0 && M.st !== 'down' && ART.s[sp + '_a0']) { const fr = Math.min(3, Math.floor((0.42 - M.atk) / 0.105)); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(M.x, M.y + 15, 12, 5, 0, 0, TAU); ctx.fill(); const s0 = ART.s[sp + '_s0'], s1 = ART.s[sp + '_a' + fr]; spr(sp + '_a' + fr, M.x + M.face * (s1.width / s1.height - s0.width / s0.height) * 14, M.y - 11, 56, M.face < 0, 0); }
+    else drawHero(ctx, sp, M.x, M.y, M.face, M.moveT, M.moving);
+    ctx.restore(); HD = hd0;
     if (M.sw > 0) { ctx.strokeStyle = 'rgba(255,220,160,' + (M.sw * 3) + ')'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(M.x, M.y - 6, 70 + (0.25 - M.sw) * 80, 0, TAU); ctx.stroke(); }
     if (M.st === 'down') { ctx.font = '800 12px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#ffd24a'; ctx.fillText(Math.ceil(M.downT) + '', M.x, M.y - 40); return; }
     const k = clamp(M.hp / M.maxHp, 0, 1); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(M.x - 15, M.y - 45, 30, 4); ctx.fillStyle = '#ffcf6a'; ctx.fillRect(M.x - 15, M.y - 45, 30 * k, 4);
@@ -2089,6 +2101,13 @@
       const openGate = (why) => { if (P.open) return; P.open = true; for (const e of enemies) if (e.jail) { e.keep = e.guard; e.rageT = 5; } if (P.lock && !P.lock.dead) P.lock.dead = true; banner(why); beep(70, 1, 'sawtooth', 0.08, 35); shake = 14; };
       if (!P.open && P.filled && P.lock && P.lock.dead) openGate('자물쇠를 부쉈다! 철문이 열린다!');
       if (!P.open && run.t >= P.openT) openGate('⚠ 철문이 열렸다! 좀비가 쏟아진다!');
+      if (A.guard && !A.guard.dead && P.filled) {
+        const gq = A.guard, gd = Math.hypot(player.x - gq.x, player.y - gq.y); A.tauntT = (A.tauntT || 0) - dt;
+        if (gd < 300 && A.tauntT <= 0) { if (!A.taunted) banner('간수: 「동료를 구출하고 싶으면 날 쓰러뜨려라!」');
+          const L = ['동료를 구출하고 싶으면 날 쓰러뜨려라!', '여기서 나가려면 나부터 넘어야지!', '이 녀석은 못 데려간다!', '덤벼라! 철문 열쇠는 나한테 있다!'];
+          nums.push({ x: gq.x, y: gq.y - gq.r - 34, v: A.taunted ? L[1 + Math.floor(Math.random() * 3)] : L[0], t: -1.6, crit: true, say: true }); A.taunted = true; A.tauntT = 9; beep(98, 0.35, 'sawtooth', 0.05, 70);
+        }
+      }
       if (A.guard && A.guard.dead) {
         openGate('간수를 쓰러뜨렸다! 철문이 열린다!');
         A.st = 'free'; A.hp = A.maxHp; A.x = A.x; banner('구출 완료! ' + A.name + ' 합류'); burst(A.x, A.y, 40, '#8fe9ff', 320); beep(784, 0.5, 'triangle', 0.07); setTimeout(() => beep(1047, 0.5, 'triangle', 0.06), 140);
@@ -2934,7 +2953,7 @@
     let stars = 0;
     if (won) { meta.prog = meta.prog || {}; meta.prog[run.st.id] = Math.max(meta.prog[run.st.id] || 0, run.sub); if (run.sub >= 5) s.wins[run.st.id] = true; stars = 1 + (player.hp >= player.maxHp * 0.5 ? 1 : 0) + (run.t - WIN_TIME <= 60 ? 1 : 0); s.stars = s.stars || {}; s.stars[run.st.id] = Math.max(s.stars[run.st.id] || 0, stars); }
     meta.mis = meta.mis || {}; const mDone = meta.mis[run.st.id] = meta.mis[run.st.id] || [0, 0, 0], mNew = [];
-    misOf(run.st).forEach((m, i) => { if (!mDone[i] && m.ok(won)) { mDone[i] = 1; meta.coins += m.r; earned += m.r; mNew.push('🎯 미션 달성: ' + m.txt + ' (+' + m.r + ')'); } });
+    misOf(run.st).forEach((m, i) => { if (!mDone[i] && m.ok(won)) { mDone[i] = 1; meta.coins += m.r; earned += m.r; mNew.push('🎯 ' + run.st.name + ' 미션 달성: ' + m.txt + ' (+' + m.r + ')'); } });
     saveMeta();
     const fresh = unlockNames().filter((n) => !before.includes(n));
     $('levelup').classList.add('hidden'); $('banner').classList.remove('show');
