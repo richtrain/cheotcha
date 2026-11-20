@@ -1721,7 +1721,7 @@
   function newRun() {
     const chr = CHARS.find((c) => c.id === meta.sel.char) || CHARS[0], st0 = STAGES.find((s) => s.id === meta.sel.stage) || STAGES[0], sub = curSub(st0.id), st = Object.assign({}, st0, { xpMul: Math.pow(st0.hpMul, 0.08) });
     run = { t: 0, kills: 0, bossKills: 0, lvl: 1, xp: 0, xpNext: 10, up: { [chr.start]: 1 },
-            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 60, bossLvl: 0, won: false,
+            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 45, bossLvl: 0, won: false,
             ch: chr, st, rerolls: ITM('reroll'), face: 1, moveT: 0, moving: false,
             pets: { bug: { x: 0, y: -30, target: null }, owl: { x: -20, y: -34, cd: 1, target: null }, cat: { x: -22, y: 8, cd: 10, face: 1 }, dragon: { x: 20, y: -30, cd: 1.5, face: 1 } } };
     const hp = chr.hp + meta.up.hp * 10 + SV('m_kal');
@@ -1786,7 +1786,7 @@
     const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5 * (1 + 0.22 * ((run.st.dl || 1) - 1))) * Math.pow(run.st.hpMul, 0.5 + 0.5 * Math.min(1, t / 200));
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
-    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss * (lvl >= 2 ? 1.8 : 1) : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
+    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss * (lvl >= 2 ? 1.3 : 0.7) : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
     const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * Math.pow(run.st.dmgMul || 1, 0.5 + 0.5 * Math.min(1, t / 200)) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
@@ -3222,7 +3222,7 @@
       run.spawnT = Math.max(0.25, 0.6 - td * 0.0012) * (td < 25 ? 0.8 : 1) * [1, 1.2, 1.08, 1, 0.95, 0.9, 0.85][run.st.dl || 1];
     }
     if (run.t >= run.nextBoss && run.t < WIN_TIME - 12) {
-      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 60;
+      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 45;
       banner('⚠ ' + BOSS_NAMES[Math.min(3, run.bossLvl - 1)] + ' 등장'); beep(110, 0.6, 'sawtooth', 0.06, 220); shake = 8;
     }
     // 정예, 돌발 사건, 최종 보스
