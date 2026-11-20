@@ -812,6 +812,18 @@
   ];
   { const SK = { nyang: [11, '#ffb0d8'], sage: [6.5, '#7dffb0'], goni: [0, '#ffd24a'], necro: [14, '#9dffb0'], kang: [15, '#ffb84a'], bung: [14, '#ffc9a0'], scarf: [5.5, '#ff9ad0', 1], jensen: [10, '#8dff6a'], musk: [12, '#ff9a4a'] }; for (const c of CHARS) if (SK[c.id]) { c.sk = { id: c.id, t: SK[c.id][0], col: SK[c.id][1], wait: !!SK[c.id][2] }; c.sigd += ' 시작 무기를 키울수록 게이지 스킬도 5단계까지 달라져요.'; } }
   Object.assign(CHARS.find((c) => c.id === 'nyang'), { sig: '길냥이 본능', skin: { shur: 'fbone' }, tn: { shur: ['생선가시 난사', '쌍가시', '관통가시', '삼중가시'] }, tn2: { shur: ['가시 분열', '가시 폭풍'] }, tx: { shur: '황금참치' } });
+  // ---------- 등급 밸런스 ----------
+  // 등급별 능력치 상한선(최소~최대) [기본, 희귀, 영웅, 전설, 신화, 히든]
+  const GCAP = {
+    hp:  [[110, 150], [110, 160], [115, 170], [120, 185], [130, 200], [180, 230]],
+    atk: [[1.0, 1.6], [1.1, 1.8], [1.2, 2.0], [1.35, 2.2], [1.5, 2.4], [1.8, 2.6]],
+    spd: [[0.95, 1.1], [0.95, 1.2], [0.95, 1.2], [0.95, 1.22], [0.95, 1.25], [1.0, 1.3]]
+  };
+  // 실측 화력(무기·고유 스킬 차이까지 보정한 실제 공격 배율). 목표 전투력: 기본 0.8 · 희귀 0.92 · 영웅 1.04 · 전설 1.2 · 신화 1.36 · 히든 1.6
+  const BAL = { keeper: [145, 1.05, 1.71], sm: [150, 0.95, 2.98], storm: [110, 1.12, 2.29], wind: [110, 1.2, 8.1], rider: [123, 1, 2.88], alch: [110, 1, 1.66],
+    sage: [121, 1, 12.28], necro: [146, 1, 5.18], scarf: [146, 1.1, 3.91], kang: [141, 1, 4.51], goni: [116, 1.06, 1.36], bung: [120, 1.03, 2.84], nyang: [125, 1.2, 2.69],
+    jensen: [135, 1, 1.95], musk: [175, 1.05, 1.83], nox: [215, 1.1, 3.92] };
+  for (const c of CHARS) { const b = BAL[c.id]; if (!b) continue; const cl = (v, r) => Math.min(r[1], Math.max(r[0], v)); c.hp = cl(b[0], GCAP.hp[c.g]); c.spd = cl(b[1], GCAP.spd[c.g]); const H = GCAP.hp[c.g], A = GCAP.atk[c.g], shown = +(A[0] + (A[1] - A[0]) * Math.min(1, Math.max(0.15, 1 - 0.7 * (c.hp - H[0]) / (H[1] - H[0])))).toFixed(2); /* 같은 등급이면 전투력은 같고, 튼튼할수록 공격 수치는 낮게 보임 */ c.pw = b[2] / shown; c.dmg = shown; }
   const GPRICE = [0, 2000, 5000, 10000, 30000, 100000]; for (const c of CHARS) if (c.price) c.price = GPRICE[c.g];
   const HERO = {
     keeper: { cloak: '#3d5db0', dark: '#27407f', trim: '#f0c35a' }, witch: { cloak: '#7a3fa6', dark: '#4e2470', trim: '#ff9a4d' },
@@ -1454,7 +1466,7 @@
     const ch = CHARS.find((c) => c.id === meta.sel.char), stg = STAGES.find((s) => s.id === meta.sel.stage), ms = meta.stats;
     const bar = (v) => '<u><i style="width:' + Math.round(clamp(v, 0.08, 1) * 100) + '%"></i></u>';
     $('showInfo').innerHTML = '<div class="gr" style="color:' + GCOL[ch.g] + '">' + GSTAR(ch) + ' ' + GRADE[ch.g] + '</div><div class="nm">' + ch.name + '</div><div class="tt">' + ch.title + (ch.style ? ' · <b style="color:#8fe9ff">' + ch.style + '</b>' : '') + '</div><div class="lore">“' + ch.lore + '”</div>' + (UQ[ch.id] ? '<div class="sig"><b>고유 스킬</b> ' + tn(ch.start, 0, false) + ' · ' + UQ[ch.id].map((q) => q[1][0] + ' ' + q[2][0]).join(' · ') + '</div>' : '') + '<div class="bars"><span>체력</span>' + bar((ch.hp + meta.up.hp * 10) / 200)
-      + '<span>공격</span>' + bar(ch.dmg * (1 + 0.06 * meta.up.dmg) / 1.56) + '<span>속도</span>' + bar(ch.spd * (1 + 0.04 * meta.up.spd) / 1.35) + '</div>';
+      + '<span>공격</span>' + bar(ch.dmg * (1 + 0.06 * meta.up.dmg) / 2.4) + '<span>속도</span>' + bar(ch.spd * (1 + 0.04 * meta.up.spd) / 1.35) + '</div>';
     const sbest = ms.best[stg.id];
     $('showStage').innerHTML = '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span><div class="rec">' + stg.desc + (sbest ? ' · 최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' ★' : '') : '') + '</div>';
     $('wlab').innerHTML = '시작 무기 <b>' + tn(ch.start, 0, false) + '</b> → ' + tn(ch.start, 3, false);
@@ -1589,7 +1601,7 @@
   let choices = [];
   const L = (id) => (run && run.up[id]) || 0;
   const stat = {
-    dmg:    () => WD * (1 + 0.25 * L('might')) * (1 + 0.06 * meta.up.dmg) * run.ch.dmg * (run.rage > 0 ? 2 : 1) * (run.fz > 0 ? 2 : 1) * (run.ch.id === 'nox' ? 1 + Math.min(0.6, Math.floor(run.kills / 100) * 0.03) : 1) * (run.ch.lvdmg ? 1 + run.ch.lvdmg * (run.lvl - 1) : 1),
+    dmg:    () => WD * (1 + 0.25 * L('might')) * (1 + 0.06 * meta.up.dmg) * run.ch.dmg * (run.ch.pw || 1) * (run.rage > 0 ? 2 : 1) * (run.fz > 0 ? 2 : 1) * (run.ch.id === 'nox' ? 1 + Math.min(0.6, Math.floor(run.kills / 100) * 0.03) : 1) * (run.ch.lvdmg ? 1 + run.ch.lvdmg * (run.lvl - 1) : 1),
     cd:     () => run.ch.cd / (1 + 0.14 * L('haste')) * (run.od > 0 ? 0.75 : 1),
     speed:  () => 150 * (1 + 0.12 * L('swift')) * (1 + 0.04 * meta.up.spd + SV('m_dosi')) * run.ch.spd,
     magnet: () => 64 * (1 + 0.5 * L('pull')) * (1 + 0.15 * meta.up.mag)
