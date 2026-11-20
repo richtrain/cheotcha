@@ -837,9 +837,9 @@
     spd: [[0.95, 1.1], [0.95, 1.2], [0.95, 1.2], [0.95, 1.22], [0.95, 1.25], [1.0, 1.3]]
   };
   // 실측 화력(무기·고유 스킬 차이까지 보정한 실제 공격 배율). 목표 전투력: 기본 0.8 · 희귀 0.92 · 영웅 1.04 · 전설 1.2 · 신화 1.36 · 히든 1.6
-  const BAL = { keeper: [145, 1.05, 2.15], sm: [150, 0.95, 2.98], storm: [110, 1.12, 1.55], wind: [110, 1.2, 8.1], rider: [123, 1, 2.88], alch: [110, 1, 1.66],
-    sage: [121, 1, 12.28], necro: [146, 1, 5.18], scarf: [146, 1.1, 3.91], kang: [141, 1, 4.51], goni: [116, 1.06, 1.36], bung: [120, 1.03, 2.84], nyang: [125, 1.2, 2.69],
-    jensen: [135, 1, 1.95], musk: [175, 1.05, 1.83], nox: [215, 1.1, 3.92] };
+  const BAL = { keeper: [145, 1.05, 2.15], sm: [150, 0.95, 7.18], storm: [110, 1.12, 2.33], wind: [110, 1.2, 10.4], rider: [123, 1, 3.39], alch: [110, 1, 3.2],
+    sage: [121, 1, 5.6], necro: [146, 1, 8.1], scarf: [146, 1.1, 4.38], kang: [141, 1, 4.8], goni: [116, 1.06, 2.02], bung: [120, 1.03, 3.87], nyang: [125, 1.2, 1.92],
+    jensen: [135, 1, 5.03], musk: [175, 1.05, 1.83], nox: [215, 1.1, 9.75] };
   // 등급이 높을수록 체력·공격·속도 막대가 모두 길어지도록 구간을 나눔(같은 등급 안에서는 역할에 따라 차이)
   const HPB = [[120, 135], [137, 152], [154, 169], [171, 186], [188, 205], [212, 232]], ATB = [[1.0, 1.18], [1.2, 1.38], [1.4, 1.58], [1.6, 1.78], [1.8, 1.98], [2.05, 2.25]], SPB2 = [[0.95, 0.99], [1.0, 1.04], [1.05, 1.09], [1.1, 1.14], [1.15, 1.19], [1.2, 1.25]];
   for (let gr = 0; gr <= 5; gr++) { const cs = CHARS.filter((c) => c.g === gr && BAL[c.id]); if (!cs.length) continue;
@@ -851,6 +851,12 @@
   const STRAIT = { forest: ['horde'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], mall: ['scatter', 'bite'], stadium: ['beast', 'iron'], bridge: ['bite', 'horde'], gwang: ['horde', 'iron'], end: ['iron', 'bite'] };
   const DIFF = { hp: 1.6, dmg: 1.35, boss: 2.2 };   // 전체 난이도
   const TR = (k) => !!(run && run.st && STRAIT[run.st.id] && STRAIT[run.st.id].includes(k));
+  { const X = (id, o) => Object.assign(CHARS.find((c) => c.id === id) || {}, o);
+    X('nyang', { tpx: { shur: ['', '가시 두 개 · 한 번 더 튕김', '더 크고 단단한 가시 · 2번 더 튕김', '가시 2개 추가 · 3번 더 튕김'] }, tp2: { shur: ['맞을 때마다 가시가 둘로 갈라짐', '갈라진 가시도 한 번 더 튕김'] } });
+    X('jensen', { tpx: { bolt: ['', '그래픽카드가 꿰뚫음 · 피해 +20%', '수랭 그래픽카드가 전부 관통', '한 장 더 · 더 빠르게 · 피해 크게 증가'] }, tn2: { bolt: ['칩 폭탄 다발', '데이터센터 폭발'] }, tp2: { bolt: ['여러 장이 흩어져 맞는 곳마다 폭발', '장 수 증가 · 폭발 확대 · 피해 크게 증가'] } });
+    X('sage', { tpx: { ice: ['', '주사기 세 대 · 더 오래 진정', '다섯 대 · 대용량 주사기', '황금 주사기 · 피해 크게 증가'] }, tn2: { ice: ['진정제 폭탄', '집단 진정'] }, tp2: { ice: ['맞으면 터져 주변을 진정(둔화)시킴', '폭발 확대 · 피해 크게 증가'] } });
+    X('bung', { tpx: { arrow: ['', '세 마리씩 던짐', '슈크림 붕어빵이 전부 꿰뚫고 터짐', '다섯 마리 · 피해 크게 증가'] }, tn2: { arrow: ['붕어빵 비', '잉어빵 폭우'] }, tp2: { arrow: ['하늘에서 붕어빵이 쏟아짐', '붕어빵 비 2배'] } });
+    X('scarf', { tpx: { boomer: ['', '세 장씩 날림', '다섯 장 · 더 큼', '일곱 장 · 피해 크게 증가'] }, tn2: { boomer: ['터지는 스카프', '연쇄 스카프'] } }); }
   const GPRICE = [0, 2000, 5000, 10000, 30000, 100000]; for (const c of CHARS) if (c.price) c.price = GPRICE[c.g];
   const HERO = {
     keeper: { cloak: '#3d5db0', dark: '#27407f', trim: '#f0c35a' }, witch: { cloak: '#7a3fa6', dark: '#4e2470', trim: '#ff9a4d' },
@@ -940,7 +946,7 @@
     flask: ['', '두 개씩 던짐 · 피해 +20%', '터진 자리에 불바다', '연쇄 폭발 3번 · 피해 크게 증가'], beam: ['', '앞뒤로 동시에 발사', '굵은 태양광선 · 더 길게', '네 방향 십자 광선 · 피해 크게 증가'], tornado: ['', '두 개를 보냄', '더 크고 세게 빨아들임', '세 개의 태풍 · 피해 크게 증가']
   };
   const EVO = {}; for (const k in TN) EVO[k] = TN[k][2];
-  const TSUF = ['', 'b', '2', '3', '4', '5', '6', '7'], TLAB = ['기본', '강화', '진화', '각성', '초월', '궁극', '신화', '무한'], TMUL = [0.6, 0.73, 0.89, 1.1, 0.97, 0.93, 1.06, 1.16], LVF = [1, 1, 0.95, 0.9, 0.86, 0.83, 0.8, 0.78, 0.76, 0.74, 0.72], TCD = [1, 1, 1, 0.9, 0.9, 0.9, 0.85, 0.8], ECH = [0, 0, 0, 0, 1, 1, 2, 2], TMAX = 7, NOECHO = { ember: 1, summon: 1, spray: 1 };
+  const TSUF = ['', 'b', '2', '3', '4', '5', '6', '7'], TLAB = ['기본', '강화', '진화', '각성', '초월', '궁극', '신화', '무한'], TMUL = [0.6, 0.73, 0.89, 1.1, 0.97, 0.93, 1.06, 1.16], LVF = [1, 1, 0.95, 0.9, 0.86, 0.83, 0.8, 0.78, 0.76, 0.74, 0.72], TCD = [1, 1, 1, 0.9, 0.9, 0.9, 0.85, 0.8], ECH = [0, 0, 0, 0, 1, 2, 2, 3], TMAX = 7, NOECHO = { ember: 1, summon: 1, spray: 1 };
   let noX = false;
   const TXC = ['', '', '', '', '120,230,255', '255,215,90', '205,125,255', ''], SKC = ['', '255,225,150', '120,230,255', '200,130,255', '255,170,60', '255,70,90'], SKN = { nyang: '고양이 대소동', sage: '응급 처치', necro: '실험체 투입', kang: '다 조려 버리겠습니다', bung: '줄 서 주세요', jensen: '신제품 발표', musk: '로켓 착륙', scarf: '6장에 만 원', goni: '오광' };
   const rbw = () => [0, 2.09, 4.19].map((o) => Math.round(155 + 100 * Math.sin(gtime * 3 + o))).join(',');
@@ -970,7 +976,8 @@
   const HUEB = { bolt: 180, orbit: 170, pulse: 90, zap: 240, ember: 250, blade: 200, boomer: 300, ice: 60, meteor: 200, shur: 120, flask: 180, beam: 140, tornado: 60 };
   const pathB = (id) => !!(run && run.path && run.path[id] === 'b');
   const tn = (id, k, b) => { const c = curCh(); if (k >= 4) { const x = c && c.tx && c.tx[id]; return x ? (k === 4 ? x : TLAB[k] + ' ' + x) : TLAB[k] + ' ' + tn(id, 3, b); } if (k >= 2 && (b === undefined ? pathB(id) : b)) return (c && c.tn2 && c.tn2[id]) ? c.tn2[id][k - 2] : TN2[id][k - 2]; return (c && c.tn && c.tn[id]) ? c.tn[id][k] : TN[id][k]; };
-  const tp = (id, k, b) => k === 4 ? '한 번에 2연속 발동 · 화력/속사 특화 선택' : k === 5 ? '한 번에 3연속 발동 · 궁극기 선택' : k === 6 ? '피해 +30% · 더 빠르게' : k === 7 ? '한 번에 4연속 발동 · 최종 형태' : (k >= 2 && (b === undefined ? pathB(id) : b)) ? TP2[id][k - 2] : TP[id][k];
+  const tpc = (id, k, b) => { const c = curCh(), pb = k >= 2 && (b === undefined ? pathB(id) : b); if (pb) return (c && c.tp2 && c.tp2[id]) ? c.tp2[id][k - 2] : TP2[id][k - 2]; return (c && c.tpx && c.tpx[id]) ? c.tpx[id][k] : TP[id][k]; };
+  const tp = (id, k, b) => k === 4 ? '한 번에 2연속 발동 · 화력/속사 특화 선택' : k === 5 ? '한 번에 3연속 발동 · 궁극기 선택' : k === 6 ? '피해 +30% · 더 빠르게' : k === 7 ? '한 번에 4연속 발동 · 최종 형태' : tpc(id, k, b);
   function mkTints() {
     if (!ART.s.fbone) { const mk = (fn) => { const c = document.createElement('canvas'); c.width = 132; c.height = 60; fn(c.getContext('2d')); return c; };
       const bone = (g, x, y, k, r, col) => { g.save(); g.translate(x, y); g.rotate(r); g.scale(k, k); g.lineCap = 'round'; g.lineJoin = 'round';
@@ -1060,7 +1067,7 @@
       ember: ['', '기름이 넓게 퍼짐 · 피해 +20%', '푸른 불 · 피해 +60%', '불바다 · 피해 크게 증가'], blade: ['', '앞뒤로 동시에 휘두름', '불붙은 배트 · 범위 확대', '범위와 피해가 폭발'],
       boomer: ['', '두 개를 던짐', '세 개 · 더 큼', '네 개 · 피해 크게 증가'], ice: ['', '세 갈래 · 더 오래 얼림', '다섯 갈래 질소 창', '거대한 얼음 · 피해 크게 증가'],
       meteor: ['', '두 개씩 · 더 넓게', '떨어진 자리에 불바다', '2개 추가 · 피해 크게 증가'], shur: ['', '한 번 더 튕김', '큼직한 공 · 2번 더 튕김', '2개 추가 · 3번 더 튕김'],
-      flask: ['', '두 개씩 던짐 · 피해 +20%', '터진 자리에 불바다', '연쇄 폭발 3번 · 피해 크게 증가'], beam: ['', '앞뒤로 동시에 발사', '굵은 슬러그탄 · 더 멀리', '네 방향 동시 사격 · 피해 크게 증가'], tornado: ['', '두 개를 보냄', '더 크고 세게 빨아들임', '세 개의 태풍 · 피해 크게 증가'],
+      flask: ['', '세 개씩 던짐 · 피해 +20%', '터진 자리에 불바다', '연쇄 폭발 3번 · 피해 크게 증가'], beam: ['', '앞뒤로 동시에 발사', '굵은 슬러그탄 · 더 멀리', '네 방향 동시 사격 · 피해 크게 증가'], tornado: ['', '두 개를 보냄', '더 크고 세게 빨아들임', '세 개의 태풍 · 피해 크게 증가'],
       summon: ['', '강화 실험체 2마리 합류', '대형 실험체가 범위로 후려침', '거대 변이체가 불바다를 일으킴'], sword: ['', '두 번 연속으로 벰', '화면을 가르는 일섬 추가', '네 번 벰 · 피해 크게 증가'], arrow: ['', '세 갈래로 쏨', '굵은 화살이 전부 꿰뚫고 폭발', '다섯 갈래 · 피해 크게 증가'], hell: ['', '두 발씩 · 더 집요하게 쫓음', '터진 자리에 감염 지대', '네 발 · 피해 크게 증가'] });
     Object.assign(TN2, { bolt: ['폭죽 다발', '불꽃놀이 대축제'], orbit: ['냉매 고리', '급속 냉동 고리'], pulse: ['섬광탄', '연속 섬광'], zap: ['누전 구역', '도시 정전'], ember: ['소독약 웅덩이', '방역 구역'],
       blade: ['풀스윙', '대회전 타법'], boomer: ['부탄가스 뚜껑', '연쇄 가스 폭발'], ice: ['냉동 폭탄', '냉동 창고'], meteor: ['벽돌 세례', '건물 붕괴'], shur: ['유리구슬', '구슬 폭포'],
@@ -1182,7 +1189,7 @@
     r_bag: (l) => '피해 ' + (40 + 15 * l) + ' · ' + (1 + Math.floor(l / 2)) + '개', r_horn: (l) => '피해 ' + (24 + 9 * l) + ' · 멈춤 ' + (0.6 + 0.1 * l).toFixed(1) + '초',
     a_acid: (l) => '초당 피해 ' + (12 + 5 * l) + ' · ' + (3.5 + 0.3 * l).toFixed(1) + '초', a_chain: (l) => '피해 ' + (22 + 8 * l) + ' · ' + (2 + l) + '번 번짐',
     m_iai: (l) => '피해 ' + (40 + 16 * l) + ' · 길이 ' + (220 + 20 * l), m_kihap: (l) => '피해 ' + (22 + 8 * l) + ' · 멈춤 ' + (0.7 + 0.12 * l).toFixed(1) + '초',
-    g_aed: (l) => '피해 ' + (24 + 9 * l) + ' · ' + (3 + l) + '명 · 멈춤 1초', g_iv: (l) => '최대 체력의 ' + (4 + 2 * l) + '% 회복',
+    g_aed: (l) => '피해 ' + (24 + 9 * l) + ' · ' + (3 + l) + '명 · 멈춤 1초', g_iv: (l) => '최대 체력의 ' + (6 + 3 * l) + '% 회복 · 주변 밀쳐내기',
     n_virus: (l) => '초당 피해 ' + (10 + 5 * l) + ' · 범위 ' + (70 + 8 * l), n_mut: (l) => '강화 실험체 ' + (1 + Math.floor(l / 2)) + '마리 · ' + (8 + l) + '초',
     c_wrap: (l) => '피해 ' + (18 + 8 * l) + ' · ' + (2 + l) + '명 · 멈춤 ' + (1 + 0.1 * l).toFixed(1) + '초', c_sale: (l) => '피해 ' + (12 + 5 * l) + ' · ' + (6 + 2 * l) + '장',
     j_chip: (l) => '피해 ' + (22 + 9 * l) + ' · ' + (1 + Math.ceil(l / 2)) + '개', j_fan: (l) => '피해 ' + (14 + 6 * l) + ' · 범위 ' + (100 + 12 * l),
@@ -1223,6 +1230,7 @@
     r_bag: ['luck', 'bug'], r_horn: ['vital', 'cat'], a_acid: ['regen', 'dragon'], a_chain: ['might', 'bug'], m_iai: ['crit', 'owl'], m_kihap: ['armor', 'cat'], g_aed: ['haste', 'owl'], g_iv: ['vital', 'cat'],
     n_virus: ['regen', 'bug'], n_mut: ['vital', 'dragon'], c_wrap: ['armor', 'cat'], c_sale: ['luck', 'bug'], j_chip: ['crit', 'dragon'], j_fan: ['haste', 'bug'], b_red: ['regen', 'cat'], b_bag: ['luck', 'owl'],
     e_sat: ['crit', 'bug'], e_drone: ['haste', 'dragon'], k_wok: ['vital', 'cat'], k_chili: ['might', 'dragon'], o_card: ['crit', 'owl'], o_dice: ['luck', 'bug'], y_paw: ['crit', 'cat'], y_mack: ['might', 'owl'], x_bite: ['regen', 'cat'], x_roar: ['armor', 'dragon'] };
+  if (UPS.r_horn) UPS.r_horn.cd0 = 2.6;
   const uCap = (id) => { const q = UREQ[id]; if (!q) return 7; return L(q[0]) < 1 ? 2 : L(q[1]) < 2 ? 4 : 7; };
   const uGated = (id) => UPS[id].kind === 'u' && L(id) > 0 && L(id) < 7 && L(id) >= uCap(id);
   const uNeeds = () => (UQ[run.ch.id] || []).map((q) => q[0]).filter(uGated).map((id) => UREQ[id][L(id) < 3 ? 0 : 1]);
@@ -1245,6 +1253,8 @@
       ctx.fillStyle = '#f2b866'; ctx.strokeStyle = 'rgba(60,30,10,.85)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(x, y, 6.5, 0, TAU); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#ff9ec4'; ctx.beginPath(); ctx.arc(x + cs * 1.5, y + sn * 1.5, 2.6, 0, TAU); ctx.fill(); for (let k = -1; k <= 1; k++) { const a = p.a + k * 0.62; ctx.beginPath(); ctx.arc(x + Math.cos(a) * 4.8, y + Math.sin(a) * 4.8, 1.5, 0, TAU); ctx.fill(); } }
   }
+  // 스킬별 보정(같은 캐릭터 두 스킬이 성격에 맞게 비슷한 값어치가 되도록 실측으로 맞춤)
+  const USKM = { k_bar: 3.6, m_kihap: 1.6, s_chain: 1.45, w_dash: 5, r_horn: 14, a_acid: 3.6, g_iv: 4, c_wrap: 6, k_chili: 3, o_card: 1.3, b_bag: 1.55, e_drone: 3, j_fan: 1.1, y_paw: 6, x_bite: 1.66 };
   function uFire(id, l, dm) {
     const tossTo = (x, y, emo, life, sz) => { throwLean(x, y); if (fx.length < 380) fx.push({ k: 'toss', x0: player.x + (x > player.x ? 10 : -10), y0: player.y - 16, x, y, t: 0, life, emo, sz: sz || 26 }); };
     const u = UPS[id], T = uT(l), TC = (c) => LVRGB[l] || c, EM = () => u.em[T], RO = ROLE[id];
@@ -1252,7 +1262,7 @@
     const px = player.x, py = player.y, dist = (e) => Math.hypot(e.x - px, e.y - py);
     const near = (n, R) => enemies.filter((e) => !e.dead && dist(e) < R).sort((a, b) => dist(a) - dist(b)).slice(0, n);
     const view = () => enemies.filter((e) => !e.dead && Math.abs(e.x - px) < VW / 2 && Math.abs(e.y - py) < VH / 2);
-    const BR = (run.ubr || {})[id], D = (b, p) => (b + p * l + 1.6 * run.lvl) * dm * ULM[l] * RM * (BR === 'a' ? 1.45 : BR === 'b' ? 0.8 : 1) * (1 + 0.2 * ((run.utx || {})[id] || 0));
+    const BR = (run.ubr || {})[id], D = (b, p) => (b + p * l + 1.6 * run.lvl) * dm * ULM[l] * RM * (BR === 'a' ? 1.45 : BR === 'b' ? 0.8 : 1) * (1 + 0.2 * ((run.utx || {})[id] || 0)) * (USKM[id] || 1);
     const pil = (x, y, w, col) => { if (fx.length < 380) fx.push({ k: 'pillar', x, y, w, t: 0, life: 0.5, col }); };
     const wave = (x, y, R, col) => { if (fx.length < 380) fx.push({ k: 'wave', x, y, R, t: 0, life: 0.4, col }); };
     const P = (x, y, r, life, dps, slow) => { if (patches.length < 70) patches.push({ x, y, r, t: 0, life, dps, seed: rand(0, TAU), s: 'ember', slow }); };
@@ -1280,9 +1290,9 @@
       case 'm_iai': { if ((a = aimA()) === null) return false; const len = 220 + 20 * l; line(a, len, 40, D(40, 16), { kb: 200 }); fx.push({ k: 'beam', a, len, wd: 14, t: 0, life: 0.22, hue: -1, c: 'rgba(' + TC('235,245,255') + ',' }); beep(1800, 0.12, 'sawtooth', 0.02, 400); } break;
       case 'm_kihap': if (!near(1, 160).length) return false; splash(px, py, 110 + 12 * l, D(22, 8), { kb: 380, col: TC('255,240,200'), stun: 0.7 + 0.12 * l }); say('이얍!'); shake = Math.max(shake, 4); break;
       case 'g_aed': { const T = near(3 + l, 300); if (!T.length) return false; for (const e of T) { if (fx.length < 380) fx.push({ k: 'arc', x: px, y: py - 16, x2: e.x, y2: e.y, t: 0, life: 0.2, seed: Math.random() * 99 }); hurt(e, D(24, 9), 0, 0, 60); stun(e, 1); } beep(900, 0.1, 'square', 0.03, 1400); } break;
-      case 'g_iv': { const h = player.maxHp * (0.04 + 0.02 * l); player.hp = Math.min(player.maxHp, player.hp + h); if (nums.length < 60) nums.push({ x: px, y: py - 26, v: '+' + Math.round(h), t: 0, heal: true }); pil(px, py, 60, TC('150,230,255')); splash(px, py, 120, 10 * dm, { kb: 300, col: TC('150,230,255'), quiet: true }); wave(px, py, 120, TC('150,230,255')); } break;
+      case 'g_iv': { const h = player.maxHp * (0.06 + 0.03 * l); player.hp = Math.min(player.maxHp, player.hp + h); if (nums.length < 60) nums.push({ x: px, y: py - 26, v: '+' + Math.round(h), t: 0, heal: true }); pil(px, py, 60, TC('150,230,255')); splash(px, py, 130 + 8 * l, D(20, 8), { kb: 300, col: TC('150,230,255'), quiet: true, stun: 0.5 }); wave(px, py, 120, TC('150,230,255')); } break;
       case 'n_virus': { const C2 = near(10, 230); if (!C2.length) return false; crowdCW(); C2.sort((a2, b2) => (b2.cw || 0) - (a2.cw || 0)); const x = C2[0].x, y = C2[0].y; tossTo(x, y, '💉', 0.32, 24); run.later.push({ t: 0.32, f: () => { P(x, y, 70 + 8 * l, 4, D(10, 5), true); splash(x, y, 70 + 8 * l, D(8, 3), { kb: 30, col: TC('150,255,150'), pc: '#9dffb0' }); } }); } break;
-      case 'n_mut': for (let i = 0; i < 1 + Math.floor(l / 2); i++) if (run.minions.length < 26) { const x = px + rand(-50, 50), y = py + rand(-50, 50); run.minions.push(mkMinion(l >= 5 && i === 0 ? 'dk' : 'knight', x, y, 8 + l)); pil(x, y, 30, TC('150,255,180')); } say('변이 촉진!'); break;
+      case 'n_mut': for (let i = 0; i < 2 + l; i++) if (run.minions.length < 30) { const x = px + rand(-60, 60), y = py + rand(-60, 60); run.minions.push(mkMinion(l >= 7 && i === 0 ? 'lord' : l >= 3 && i < (l >= 5 ? 2 : 1) ? 'dk' : 'knight', x, y, 9 + l)); pil(x, y, 30, TC('150,255,180')); } say('변이 촉진!'); break;
       case 'c_wrap': { const T = near(2 + l, 260); if (!T.length) return false; for (const e of T) { hurt(e, D(18, 8), 0, 0, 0); stun(e, 1 + 0.1 * l); if (!e.dead) e.slowT = Math.max(e.slowT || 0, 2.5); if (fx.length < 380) fx.push({ k: 'wave', x: e.x, y: e.y, R: 30, t: 0, life: 0.5, col: TC('255,150,210') }); } } break;
       case 'c_sale': { const n = 6 + 2 * l, a0 = rand(0, TAU); for (let i = 0; i < n; i++) shoot(a0 + i * TAU / n, 420, { dmg: D(12, 5), pierce: 99, life: 0.9, emo: EM(), sz: 26, spin: true, col: TC('255,170,210') }); beep(1100, 0.06, 'triangle', 0.02, 1500); } break;
       case 'j_chip': { if (!near(1, 520).length) return false; for (let i = 0; i < 1 + Math.ceil(l / 2); i++) shoot(rand(0, TAU), 330, { dmg: D(22, 9), home: 5, life: 2.2, ex: 45, exm: 0.6, emo: EM(), sz: 26, col: TC('140,255,120'), pc: '#8dff6a' }); } break;
@@ -1422,7 +1432,7 @@
     { id: 'b_food', em: '🍙', name: '전투 식량', desc: '이번 판 최대 체력 +40%', cost: 900, buff: 1 },
     { id: 'b_drink', em: '💉', name: '각성제', desc: '이번 판 모든 피해 +30%', cost: 1400, buff: 1 },
     { id: 'b_vest', em: '🦺', name: '방탄조끼', desc: '이번 판 받는 피해 -25%', cost: 1400, buff: 1 },
-    { id: 'b_note', em: '📒', name: '오답 노트', desc: '이번 판 경험치 +40%', cost: 1000, buff: 1 },
+    { id: 'b_note', em: '📒', name: '오답 노트', desc: '이번 판 경험치 +25%', cost: 1000, buff: 1 },
     { id: 'b_treat', em: '🦴', name: '펫 간식', desc: '반려동물 하나를 Lv2로 데리고 시작', cost: 800, buff: 1 },
     { id: 'b_charm', em: '🧧', name: '행운 부적', desc: '고유 스킬 하나를 Lv2로 시작 · 다시 뽑기 +2', cost: 1800, buff: 1 }];
   const BUF = (k) => !!(run && run.bf && run.bf[k]);
@@ -1709,7 +1719,7 @@
   };
 
   function newRun() {
-    const chr = CHARS.find((c) => c.id === meta.sel.char) || CHARS[0], st0 = STAGES.find((s) => s.id === meta.sel.stage) || STAGES[0], sub = curSub(st0.id), st = Object.assign({}, st0, { xpMul: Math.pow(st0.hpMul, 0.25) });
+    const chr = CHARS.find((c) => c.id === meta.sel.char) || CHARS[0], st0 = STAGES.find((s) => s.id === meta.sel.stage) || STAGES[0], sub = curSub(st0.id), st = Object.assign({}, st0, { xpMul: Math.pow(st0.hpMul, 0.08) });
     run = { t: 0, kills: 0, bossKills: 0, lvl: 1, xp: 0, xpNext: 10, up: { [chr.start]: 1 },
             cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 60, bossLvl: 0, won: false,
             ch: chr, st, rerolls: ITM('reroll'), face: 1, moveT: 0, moving: false,
@@ -1773,11 +1783,11 @@
   // ---------- 적 ----------
   function spawn(type, x, y, lvl) {
     const T = TYPES[type], t = run.t * DK;
-    const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5) * run.st.hpMul;
+    const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5 * (1 + 0.22 * ((run.st.dl || 1) - 1))) * Math.pow(run.st.hpMul, 0.5 + 0.5 * Math.min(1, t / 200));
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
     const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss * (lvl >= 2 ? 1.8 : 1) : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
-    const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * (run.st.dmgMul || 1) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
+    const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * Math.pow(run.st.dmgMul || 1, 0.5 + 0.5 * Math.min(1, t / 200)) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
     else if (type !== 'giant' && (run.st.dl || 1) >= 3 && t > 130 - 12 * (run.st.dl || 1) && Math.random() < Math.min([0, 0, 0, 0.1, 0.17, 0.24, 0.32][run.st.dl || 1], (t - 60) / 560)) { e.fast = true; e.speed = Math.min(e.speed * 1.6, 178); }
@@ -1816,7 +1826,7 @@
   // 별 1개: 느린 좀비만 / 2개: 침 뱉는·비명·방패 추가 / 3개: 돌진·자폭 추가 / 4개 이상: 도약까지 전부
   const MOBBAN = [null, { charger: 1, leaper: 1, bomber: 1, spitter: 1, screamer: 1, shield: 1, clown: 1, giant: 1 }, { charger: 1, leaper: 1, bomber: 1, clown: 1, giant: 1 }, { leaper: 1, giant: 1 }, {}, {}];
   function pickType(t) {
-    t = t * 1.6 + run.st.early; const ban = MOBBAN[SDN(run.st)] || {};
+    t = t * 1.6 + run.st.early * 0.6; const ban = MOBBAN[SDN(run.st)] || {};
     const cn = {}; for (const e of enemies) cn[e.type] = (cn[e.type] || 0) + 1;
     const mix = MIX[run.st.id] || {}, r2 = Math.random();
     if (run.st.mob && !ban[run.st.mob] && r2 > 0.87 && (cn[run.st.mob] || 0) < 7) return run.st.mob;
@@ -2910,7 +2920,7 @@
       if (run.cd.ice <= 0) {
         const tg = nearest(1)[0];
         if (tg) {
-          const n = Math.min(w.lv, 3) + (w.tr >= 2 ? 2 : 0), a0 = Math.atan2(tg.y - player.y, tg.x - player.x);
+          const n = [1, 3, 5, 5][w.tr], a0 = Math.atan2(tg.y - player.y, tg.x - player.x);
           for (let i = 0; i < n; i++) { const a = a0 + (i - (n - 1) / 2) * 0.2; bullets.push({ x: player.x, y: player.y - 4, vx: Math.cos(a) * 400, vy: Math.sin(a) * 400, r: [6, 7, 9, 12][w.tr], dmg: (10 + 4 * w.lv) * w.m, pierce: w.b ? 0 : 2 + w.tr * 2, life: 1.1, hit: [], s: wname('ice', w.tr), sz: [26, 34, 46, 58][w.tr], off: Math.PI / 4, col: '160,220,255', pc: '#bfe8ff', slow: 1.5 + w.tr * 0.6, ice: true, ex: w.b ? (w.tr === 3 ? 84 : 58) : 0, exm: 0.9 }); }
           run.cd.ice = 1.25 * w.c; beep(1200, 0.08, 'sine', 0.02, 600);
         } else run.cd.ice = 0.1;
@@ -2941,7 +2951,7 @@
         const tg = nearest(5, 560);
         if (tg.length) {
           const n = 1 + (w.lv >= 2 ? 1 : 0) + (w.lv >= 4 ? 1 : 0) + (w.tr === 3 ? 2 : 0);
-          for (let i = 0; i < n; i++) { const e = tg[i % tg.length], a = Math.atan2(e.y - player.y, e.x - player.x) + (i >= tg.length ? (Math.floor(i / tg.length) * 0.2) * (i % 2 ? 1 : -1) : 0); bullets.push({ x: player.x, y: player.y - 4, vx: Math.cos(a) * 430, vy: Math.sin(a) * 430, r: [7, 8, 11, 14][w.tr], dmg: (13 + 3 * w.lv) * w.m, pierce: 0, bounce: 3 + (w.lv >= 3 ? 1 : 0) + (w.lv >= 5 ? 2 : 0) + (w.tr === 3 ? 3 : 0), life: 1.6, hit: [], s: wname('shur', w.tr), sz: [22, 30, 40, 52][w.tr], spin: true, col: '170,255,190', split: w.b ? (w.tr === 3 ? 2 : 1) : 0 }); }
+          for (let i = 0; i < n; i++) { const e = tg[i % tg.length], a = Math.atan2(e.y - player.y, e.x - player.x) + (i >= tg.length ? (Math.floor(i / tg.length) * 0.2) * (i % 2 ? 1 : -1) : 0); bullets.push({ x: player.x, y: player.y - 4, vx: Math.cos(a) * 430, vy: Math.sin(a) * 430, r: [7, 8, 11, 14][w.tr], dmg: (13 + 3 * w.lv) * w.m, pierce: 0, bounce: 3 + [0, 1, 3, 6][w.tr], life: 1.6, hit: [], s: wname('shur', w.tr), sz: [22, 30, 40, 52][w.tr], spin: true, col: '170,255,190', split: w.b ? (w.tr === 3 ? 2 : 1) : 0 }); }
           run.cd.shur = 0.78 * w.c; beep(1500, 0.04, 'square', 0.012, 900);
         } else run.cd.shur = 0.2;
       }
@@ -3174,7 +3184,7 @@
       }
     }
 
-    updatePets(dt, dm * (TR('beast') ? 2.1 : 1)); updateAlly(dt, dm); updateMerc(dt, WD * 4.2 * (1 + 0.25 * L('might')) * (1 + run.t / 240));
+    updatePets(dt, dm * (TR('beast') ? 2.1 : 1)); updateAlly(dt, dm); updateMerc(dt, WD * 1.7 * (1 + 0.25 * L('might')) * (1 + run.t / 240));
     updateMinions(dt, dm);
 
     // 통조림, 회복
@@ -3185,7 +3195,7 @@
       if (scat && !g.pull && (g.age = (g.age || 0) + dt) > 8 + 3 * L('pull') + 2 * L('bug')) { g.gone = true; continue; }
       const dx = player.x - g.x, dy = player.y - g.y, d = Math.hypot(dx, dy) || 1;
       if (g.pull || d < mag) { const s = g.pull ? 760 : 270 + (mag - d) * 4; g.x += dx / d * s * dt; g.y += dy / d * s * dt; }
-      if (d < 16) { run.xp += g.v * 2.2 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)) * (BUF('note') ? 1.4 : 1); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
+      if (d < 16) { run.xp += g.v * 2.2 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)) * (BUF('note') ? 1.25 : 1); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
     }
     if (gems.some((g) => g.gone)) gems = gems.filter((g) => !g.gone);
     if (gems.length > 420) { const g = gems.shift(); g.gone = true; gems[0].v += g.v; gems[0].big = true; }
