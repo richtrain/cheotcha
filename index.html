@@ -2225,7 +2225,8 @@
   function poolNow() {
     const cnt = { w: 0, p: 0, pet: 0, u: 0 };
     for (const id in run.up) cnt[UPS[id].kind]++;
-    return Object.keys(UPS).filter((id) => L(id) < capOf(id) && (L(id) > 0 || cnt[UPS[id].kind] < SLOTS[UPS[id].kind]) && canUse(id) && (!UPS[id].ch || UPS[id].ch === run.ch.id) && !uGated(id));
+    const nd = new Set(uNeeds());
+    return Object.keys(UPS).filter((id) => L(id) < capOf(id) && (L(id) > 0 || cnt[UPS[id].kind] < SLOTS[UPS[id].kind] || nd.has(id)) && canUse(id) && (!UPS[id].ch || UPS[id].ch === run.ch.id) && !uGated(id));
   }
   function grant(id, n) {
     const u = UPS[id], was = L(id), now = Math.max(was, Math.min(capOf(id), u.kind === 'u' ? uCap(id) : 99, was + n));
@@ -2260,7 +2261,9 @@
     const sk = pool.filter((x) => myS.includes(x)), txs = myS.filter((x) => L(x) > 0 && L(x) >= capOf(x) && ((run.utx || {})[x] || 0) < 10);
     const st = pool.filter((x) => UPS[x].kind === 'p'), pt = pool.filter((x) => UPS[x].kind === 'pet'), need = uNeeds().filter((x) => pool.includes(x));
     const take = (arr) => { const a = arr.filter((x) => !choices.some((c) => c.id === x)); if (!a.length) return false; choices.push({ id: rnd(a), n: 1 }); return true; };
-    if ((sk.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.6)) { run.skMiss = 0; if (sk.length) choices.push({ id: rnd(sk), n: 1 }); else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
+    const skw = []; for (const x of sk) for (let k = 0; k < 8 - L(x); k++) skw.push(x);
+    for (const x of myS) if (uGated(x)) { const q = UREQ[x][L(x) < 3 ? 0 : 1]; if (pool.includes(q)) for (let k = 0; k < 8 - L(x); k++) skw.push('#' + q); }
+    if ((skw.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.6)) { run.skMiss = 0; if (skw.length) { const p = rnd(skw); choices.push({ id: p[0] === '#' ? p.slice(1) : p, n: 1 }); } else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
     if (need.length && Math.random() < 0.75) take(need);
     if (choices.length < 3) take(st);
     if (choices.length < 3) { const ptw = run.ch.id === 'nyang' && pt.includes('cat') ? pt.concat(['cat', 'cat']) : pt; if (!((Math.random() < 0.6 || !st.length) && take(ptw))) take(st); }
