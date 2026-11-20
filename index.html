@@ -790,7 +790,7 @@
     { id: 'm_army', name: '군용품 아저씨', shop: '군용품점', start: 'flask', per: 0.03, d: (v) => '받는 피해 -' + Math.round(v * 100) + '%', line: '충성! 장비 챙겨!' },
     { id: 'm_dosi', name: '도매 언니', shop: '도매상', start: 'shur', per: 0.025, d: (v) => '이동 속도 +' + (v * 100).toFixed(1).replace('.0', '') + '%', line: '빨리빨리 움직여!' }
   ];
-  const SL = (id) => (meta.shops && meta.shops[id]) || 0, SV = (id) => SL(id) * MERCH.find((m) => m.id === id).per, shopCost = (lv) => 1500 * Math.pow(2.2, lv - 1);
+  const SL = (id) => (meta.shops && meta.shops[id]) || 0, SV = (id) => SL(id) * MERCH.find((m) => m.id === id).per, shopCost = (lv) => Math.round(1500 * Math.pow(2.2, lv - 1) / 100) * 100;
   const GRADE = ['일반', '희귀', '영웅', '전설', '신화', '히든'], GCOL = ['#b9c2d0', '#6fb8ff', '#c58cff', '#ffb84a', '#7ff3ff', '#ff5a7a'], GSTAR = (c) => c.hidden ? '？' : '★'.repeat(c.g + 1);
   const CHARS = [
     { id: 'keeper', name: '한서윤', title: '편의점 야간 알바', g: 0, style: '투척형', lore: '새벽 세 시, 손님 대신 좀비가 들어왔다. 일단 진열대에 있던 걸 던졌다.', sig: '폐기 삼각김밥', sigd: '판마다 한 번, 쓰러져도 체력 50%로 다시 일어나요.', desc: '균형 잡힌 능력', start: 'bolt', hp: 145, spd: 1.05, dmg: 2.0, cd: 0.85, unlock: null },
@@ -823,7 +823,13 @@
   const BAL = { keeper: [145, 1.05, 1.71], sm: [150, 0.95, 2.98], storm: [110, 1.12, 1.55], wind: [110, 1.2, 8.1], rider: [123, 1, 2.88], alch: [110, 1, 1.66],
     sage: [121, 1, 12.28], necro: [146, 1, 5.18], scarf: [146, 1.1, 3.91], kang: [141, 1, 4.51], goni: [116, 1.06, 1.36], bung: [120, 1.03, 2.84], nyang: [125, 1.2, 2.69],
     jensen: [135, 1, 1.95], musk: [175, 1.05, 1.83], nox: [215, 1.1, 3.92] };
-  for (const c of CHARS) { const b = BAL[c.id]; if (!b) continue; const cl = (v, r) => Math.min(r[1], Math.max(r[0], v)); c.hp = cl(b[0], GCAP.hp[c.g]); c.spd = cl(b[1], GCAP.spd[c.g]); const H = GCAP.hp[c.g], A = GCAP.atk[c.g], shown = +(A[0] + (A[1] - A[0]) * Math.min(1, Math.max(0.15, 1 - 0.7 * (c.hp - H[0]) / (H[1] - H[0])))).toFixed(2); /* 같은 등급이면 전투력은 같고, 튼튼할수록 공격 수치는 낮게 보임 */ c.pw = b[2] / shown; c.dmg = shown; }
+  // 등급이 높을수록 체력·공격·속도 막대가 모두 길어지도록 구간을 나눔(같은 등급 안에서는 역할에 따라 차이)
+  const HPB = [[120, 135], [137, 152], [154, 169], [171, 186], [188, 205], [212, 232]], ATB = [[1.0, 1.18], [1.2, 1.38], [1.4, 1.58], [1.6, 1.78], [1.8, 1.98], [2.05, 2.25]], SPB2 = [[0.95, 0.99], [1.0, 1.04], [1.05, 1.09], [1.1, 1.14], [1.15, 1.19], [1.2, 1.25]];
+  for (let gr = 0; gr <= 5; gr++) { const cs = CHARS.filter((c) => c.g === gr && BAL[c.id]); if (!cs.length) continue;
+    const pos = (v, arr) => { const lo = Math.min(...arr), hi = Math.max(...arr); return hi > lo ? (v - lo) / (hi - lo) : 0.5; }, hs = cs.map((c) => BAL[c.id][0]), ss = cs.map((c) => BAL[c.id][1]);
+    for (const c of cs) { const b = BAL[c.id], ph = pos(b[0], hs), ps = pos(b[1], ss), L2 = (r, p) => r[0] + (r[1] - r[0]) * p;
+      c.hp = Math.round(L2(HPB[gr], ph)); c.spd = +L2(SPB2[gr], ps).toFixed(2); const shown = +L2(ATB[gr], 1 - 0.8 * ph).toFixed(2);
+      c.pw = b[2] / shown * Math.sqrt(b[0] / c.hp); c.dmg = shown; } }
   const TRAITS = { bite: ['🦷 맹공', '좀비 공격력 +55%', '체력·갑옷·비타민을 챙기세요'], iron: ['🛡️ 철갑', '좀비가 받는 피해 -58% · 치명타는 철갑을 뚫어요', '근력 운동·급소 노리기 한 단계마다 철갑 12% 관통'], horde: ['🧟 떼거리', '빠른 좀비가 1.5배 몰려와요(대신 조금 약하고 통조림이 적어요)', '반려동물이 큰 도움이 돼요'], scatter: ['📦 흩어진 보급', '통조림이 8초 뒤 사라지고 줍는 범위 -40%', '자석 집게(+3초)·배달 드론(+2초)이 통조림을 오래 남게 해요'], beast: ['🐾 동물의 밤', '반려동물 피해 +80% · 내 공격 피해 -15%', '반려동물을 꼭 데려가세요'] };
   const STRAIT = { forest: ['horde'], grave: ['iron'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], bridge: ['bite'], end: ['iron', 'bite'] };
   const DIFF = { hp: 1.15, dmg: 1.2 };   // 전체 난이도
@@ -1092,6 +1098,10 @@
   Object.assign(STAGE_PROPS, { tunnel: ['pillar', 'boulder', 'boulder', 'lamp'], tower: ['pillar', 'lamp', 'crystal', 'boulder'], depot: ['lamp', 'pillar', 'boulder', 'stump', 'deadtree'] });
   Object.assign(STAGE_PROPS, { hosp: ['pillar', 'coffin', 'lamp', 'boulder', 'crystal'], park: ['lamp', 'lamp', 'bush', 'oak', 'pillar', 'stump'], base: ['boulder', 'boulder', 'pillar', 'deadtree', 'icespike'] });
   Object.assign(TYPES, { medic: { r: 12, hp: 40, speed: 46, dmg: 8, xp: 5, col: '#8dffb0', dark: '#1f5a3a' }, clown: { r: 13, hp: 46, speed: 64, dmg: 14, xp: 4, col: '#ff8ad0', dark: '#6a1f5a' }, soldier: { r: 13, hp: 60, speed: 50, dmg: 13, xp: 5, col: '#a8b878', dark: '#3a4420' }, giant: { r: 26, hp: 420, speed: 30, dmg: 26, xp: 14, col: '#9a8a7a', dark: '#3a2a20' } });
+  // 장소 난이도: [적 체력, 적 공격력, 통조림 배율, 등급, 권장]
+  const STIER = { nam: [1, 1, 1, 0], forest: [1.15, 1, 1.2, 0], grave: [1.4, 1.05, 1.5, 1], ice: [1.75, 1.1, 2, 1], lava: [2.2, 1.18, 2.5, 1], abyss: [2.9, 1.27, 3.2, 2], hosp: [3.8, 1.37, 4, 2],
+    park: [5, 1.48, 5, 2], base: [6.5, 1.6, 6, 3], tunnel: [8.4, 1.75, 7.5, 3], tower: [10.8, 1.92, 9, 4], depot: [14, 2.12, 11, 4], metro: [18, 2.35, 13, 4], bridge: [19, 2.6, 20, 5], end: [28, 3.0, 30, 6] };
+  const DLAB = [['쉬움', '#8dffb0', ''], ['보통', '#bfe8ff', ''], ['어려움', '#ffd27a', '전설 이상 또는 용병 권장'], ['매우 어려움', '#ffa060', '용병·아이템 권장'], ['지옥', '#ff6a5a', '신화 이상 · 용병 · 아이템 권장'], ['극악', '#ff3a7a', '신화 미만은 좀비가 1.6배 더 강해요 · 용병 풀강화와 아이템 필수'], ['극악 ☠', '#ff2a4a', '히든 캐릭터가 아니면 좀비가 1.6배 더 강해요 · 용병 풀강화 · 재건 · 아이템 전부 필요']];
   STAGES.unshift({ id: 'nam', name: '남대문시장', desc: '스카프리오의 시장 · 기본 난이도', hpMul: 1, coinMul: 1, early: 0, unlock: null, fin: '시장 상인회장 좀비', bg: [30, 22, 18], patch: '150,90,60', amb: '255,190,120', sw: 'linear-gradient(160deg,#5a3424,#160c08 70%)' });
   // 조합: 무기 Lv5 + 짝이 되는 능력 Lv3
   const COMBO = { bolt: ['might', '강속구'], zap: ['haste', '과전류'], ember: ['vital', '사골 기름'], blade: ['might', '4번 타자'], boomer: ['swift', '회전 돌풍'], ice: ['regen', '냉찜질'], meteor: ['luck', '날벼락'], shur: ['crit', '마세 샷'], flask: ['might', '고농축 연료'], beam: ['crit', '헤드샷'], tornado: ['pull', '진공청소기'], summon: ['vital', '영양 주사'], sword: ['swift', '발도술'], arrow: ['crit', '엑스텐'], hell: ['regen', '공생'], cart: ['swift', '과속 카트'], spray: ['haste', '무한 분사'], kick: ['haste', '터보 모드'], ev: ['haste', '급속 충전'], oil: ['vital', '든든한 조림'], hwatu: ['luck', '삼팔광땡'] };
@@ -1338,8 +1348,16 @@
   applySave(saveRaw);
   if (!saveRaw) IDB((st) => { const q = st.get('meta'); q.onsuccess = () => { if (q.result && state === 'menu') { applySave(q.result); try { localStorage.setItem('lanternMeta', q.result); } catch (e) {} if (window.__gift) window.__gift(); renderMenu(); } }; });
   function saveMeta() { const v = JSON.stringify(meta); try { localStorage.setItem('lanternMeta', v); } catch (e) {} IDB((st) => st.put(v, 'meta')); }
+  const NF = (n) => Math.round(n || 0).toLocaleString('ko-KR');
   const ITM = (k) => ((meta.items || {})[k] || 0);
-  const ITEMS = [{ id: 'revive', name: '비상 구급함', desc: '쓰러지면 한 번 다시 일어나요 · 쓰면 사라져요', cost: 1500 }, { id: 'reroll', name: '다시 뽑기', desc: '레벨업 선택지를 한 번 다시 뽑아요 · 쓰면 사라져요', cost: 300 }];
+  const ITEMS = [{ id: 'revive', name: '비상 구급함', desc: '쓰러지면 한 번 다시 일어나요 · 쓰면 사라져요', cost: 1500 }, { id: 'reroll', name: '다시 뽑기', desc: '레벨업 선택지를 한 번 다시 뽑아요 · 쓰면 사라져요', cost: 300 },
+    { id: 'b_food', em: '🍙', name: '전투 식량', desc: '이번 판 최대 체력 +40%', cost: 900, buff: 1 },
+    { id: 'b_drink', em: '💉', name: '각성제', desc: '이번 판 모든 피해 +30%', cost: 1400, buff: 1 },
+    { id: 'b_vest', em: '🦺', name: '방탄조끼', desc: '이번 판 받는 피해 -25%', cost: 1400, buff: 1 },
+    { id: 'b_note', em: '📒', name: '오답 노트', desc: '이번 판 경험치 +40%', cost: 1000, buff: 1 },
+    { id: 'b_treat', em: '🦴', name: '펫 간식', desc: '반려동물 하나를 Lv2로 데리고 시작', cost: 800, buff: 1 },
+    { id: 'b_charm', em: '🧧', name: '행운 부적', desc: '고유 스킬 하나를 Lv2로 시작 · 다시 뽑기 +2', cost: 1800, buff: 1 }];
+  const BUF = (k) => !!(run && run.bf && run.bf[k]);
   const metaCost = (lv) => Math.round(120 * Math.pow(1.6, lv));
   for (const m of META) { if (m.id === 'def') m.max = 8; else if (m.id !== 'reroll' && m.id !== 'revive') m.max = 10; if (m.id === 'revive') m.mul = 25; }
   const curSub = (id) => 5, stCode = (id) => '' + (STAGES.findIndex((x) => x.id === id) + 1);
@@ -1469,7 +1487,7 @@
   const SHOW_MON = { forest: ['shade', 'bat', 'wisp'], grave: ['skel', 'shade', 'bat'], ice: ['frost', 'brute', 'wisp'], lava: ['charger', 'bomber', 'brute'] };
   SHOW_MON.abyss = ['skel', 'charger', 'brute']; SHOW_MON.metro = ['leaper', 'giant', 'charger']; SHOW_MON.bridge = ['soldier', 'giant', 'shield']; SHOW_MON.end = ['screamer', 'giant', 'clown']; SHOW_MON.hosp = ['medic', 'giant', 'screamer']; SHOW_MON.park = ['clown', 'giant', 'leaper']; SHOW_MON.base = ['soldier', 'giant', 'shield']; SHOW_MON.tunnel = ['leaper', 'giant', 'bat']; SHOW_MON.tower = ['screamer', 'giant', 'charger']; SHOW_MON.depot = ['soldier', 'giant', 'clown'];
   function renderMenu() {
-    $('coinN').textContent = meta.coins;
+    $('coinN').textContent = NF(meta.coins);
     if (meta.own && !meta.rf2) { meta.rf2 = 1; const RF = { alch: 300, rider: 500, sm: 600, sage: 600 }; for (const k in RF) if (meta.own[k]) meta.coins = (meta.coins || 0) + RF[k]; if (((meta.stats || {}).kills || 0) >= 500) meta.own.storm = true; saveMeta(); }
     if (meta.own && !meta.rf1) { meta.rf1 = 1; const RF = { alch: 150, goni: 350, necro: 350, kang: 300, sage: 100 }; for (const k in RF) if (meta.own[k]) meta.coins = (meta.coins || 0) + RF[k]; saveMeta(); }
     if (meta.own && meta.own.hunter) { delete meta.own.hunter; meta.coins = (meta.coins || 0) + 250; saveMeta(); }
@@ -1477,10 +1495,10 @@
     if (!unlocked((STAGES.find((s) => s.id === meta.sel.stage) || {}).unlock)) meta.sel.stage = 'forest';
     const ch = CHARS.find((c) => c.id === meta.sel.char), stg = STAGES.find((s) => s.id === meta.sel.stage), ms = meta.stats;
     const bar = (v) => '<u><i style="width:' + Math.round(clamp(v, 0.08, 1) * 100) + '%"></i></u>';
-    $('showInfo').innerHTML = '<div class="gr" style="color:' + GCOL[ch.g] + '">' + GSTAR(ch) + ' ' + GRADE[ch.g] + '</div><div class="nm">' + ch.name + '</div><div class="tt">' + ch.title + (ch.style ? ' · <b style="color:#8fe9ff">' + ch.style + '</b>' : '') + '</div><div class="lore">“' + ch.lore + '”</div>' + (UQ[ch.id] ? '<div class="sig"><b>고유 스킬</b> ' + tn(ch.start, 0, false) + ' · ' + UQ[ch.id].map((q) => q[1][0] + ' ' + q[2][0]).join(' · ') + '</div>' : '') + '<div class="bars"><span>체력</span>' + bar((ch.hp + meta.up.hp * 10) / 200)
-      + '<span>공격</span>' + bar(ch.dmg * (1 + 0.06 * meta.up.dmg) / 2.4) + '<span>속도</span>' + bar(ch.spd * (1 + 0.04 * meta.up.spd) / 1.35) + '</div>';
+    $('showInfo').innerHTML = '<div class="gr" style="color:' + GCOL[ch.g] + '">' + GSTAR(ch) + ' ' + GRADE[ch.g] + '</div><div class="nm">' + ch.name + '</div><div class="tt">' + ch.title + (ch.style ? ' · <b style="color:#8fe9ff">' + ch.style + '</b>' : '') + '</div><div class="lore">“' + ch.lore + '”</div>' + (UQ[ch.id] ? '<div class="sig"><b>고유 스킬</b> ' + tn(ch.start, 0, false) + ' · ' + UQ[ch.id].map((q) => q[1][0] + ' ' + q[2][0]).join(' · ') + '</div>' : '') + '<div class="bars"><span>체력</span>' + bar(ch.hp / 240)
+      + '<span>공격</span>' + bar(ch.dmg / 2.3) + '<span>속도</span>' + bar((ch.spd - 0.75) / 0.52) + '</div>';
     const sbest = ms.best[stg.id];
-    $('showStage').innerHTML = (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span><div class="rec">' + stg.desc + (sbest ? ' · 최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' ★' : '') : '') + '</div>';
+    $('showStage').innerHTML = (stg.dl !== undefined ? '<div class="rec" style="color:' + DLAB[stg.dl][1] + ';font-weight:800">난이도 ' + DLAB[stg.dl][0] + (DLAB[stg.dl][2] ? ' · ' + DLAB[stg.dl][2] : '') + '</div>' : '') + (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span><div class="rec">' + stg.desc + (sbest ? ' · 최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' ★' : '') : '') + '</div>';
     $('wlab').innerHTML = '시작 무기 <b>' + tn(ch.start, 0, false) + '</b> → ' + tn(ch.start, 3, false);
     $('wroad').innerHTML = [0, 1, 2, 3].map((k) => '<span title="' + TN[ch.start][k] + '">' + tierIcon(ch.start, k) + '</span>').join('<em>›</em>');
     const cb = $('chars'); cb.innerHTML = '';
@@ -1495,8 +1513,8 @@
       if (c.price) { const tg = document.createElement('em'); tg.className = 'tg'; tg.textContent = ok ? '영입 완료' : '골드 영입'; b.appendChild(tg); }
       b.appendChild(cv); if (c.id === 'nyang' && !hid) { b.classList.add('bfly'); b.insertAdjacentHTML('beforeend', '<i class="bf b1">🦋</i><i class="bf b2">🦋</i><i class="bf b3">🦋</i>'); }
       const d = document.createElement('div'), head = '<span class="gr" style="color:' + GCOL[c.g] + '">' + GSTAR(c) + ' ' + GRADE[c.g] + '</span>';
-      d.innerHTML = hid ? head + '<div class="n">???</div><div class="lk">🔒 ' + c.unlock.text + '</div>' + (buy ? '<div class="lk pr' + (can ? ' can' : '') + '">' + (arm ? '한 번 더 누르면 영입' : '또는 ' + GC + ' ' + cp(c) + ' 골드' + (cp(c) < c.price ? ' (구출 할인)' : '')) + '</div>' : '')
-        : head + '<div class="n">' + c.name + '</div><div class="tt">' + c.title + '</div>' + (ok ? (c.style ? '<div class="d">' + c.style + '</div>' : '') : buy ? '<div class="lk pr' + (can ? ' can' : '') + '">' + (arm ? '한 번 더 누르면 영입' : GC + ' ' + cp(c) + ' 골드' + (cp(c) < c.price ? ' (구출 할인)' : '') + (can ? '로 영입' : ' 필요')) + '</div>' + (c.unlock ? '<div class="lk" style="font-size:10.5px;opacity:.75">또는 ' + c.unlock.text + '</div>' : '') : '<div class="lk">🔒 ' + c.unlock.text + '</div>');
+      d.innerHTML = hid ? head + '<div class="n">???</div><div class="lk">🔒 ' + c.unlock.text + '</div>' + (buy ? '<div class="lk pr' + (can ? ' can' : '') + '">' + (arm ? '한 번 더 누르면 영입' : '또는 ' + GC + ' ' + NF(cp(c)) + ' 골드' + (cp(c) < c.price ? ' (구출 할인)' : '')) + '</div>' : '')
+        : head + '<div class="n">' + c.name + '</div><div class="tt">' + c.title + '</div>' + (ok ? (c.style ? '<div class="d">' + c.style + '</div>' : '') : buy ? '<div class="lk pr' + (can ? ' can' : '') + '">' + (arm ? '한 번 더 누르면 영입' : GC + ' ' + NF(cp(c)) + ' 골드' + (cp(c) < c.price ? ' (구출 할인)' : '') + (can ? '로 영입' : ' 필요')) + '</div>' + (c.unlock ? '<div class="lk" style="font-size:10.5px;opacity:.75">또는 ' + c.unlock.text + '</div>' : '') : '<div class="lk">🔒 ' + c.unlock.text + '</div>');
       b.appendChild(d);
       if (ok) b.addEventListener('click', () => { meta.sel.char = c.id; buyArm = null; saveMeta(); initAudio(); beep(620, 0.08, 'triangle', 0.04, 900); renderMenu(); });
       else if (buy) b.addEventListener('click', () => {
@@ -1529,7 +1547,7 @@
     }
     { const st = STAGES.find((x) => x.id === meta.sel.stage) || STAGES[0], dn = (meta.mis || {})[st.id] || [];
       $('misHead').innerHTML = '🎯 <b>' + st.name + '</b> 미션 <em>' + dn.filter(Boolean).length + ' / 3</em>';
-      $('misList').innerHTML = misOf(st).map((m, i) => '<div class="' + (dn[i] ? 'ok' : '') + '"><i>' + (dn[i] ? '✅' : '🎯') + '</i>' + m.txt + '<b>' + (dn[i] ? '달성' : GC + ' ' + m.r) + '</b></div>').join(''); }
+      $('misList').innerHTML = misOf(st).map((m, i) => '<div class="' + (dn[i] ? 'ok' : '') + '"><i>' + (dn[i] ? '✅' : '🎯') + '</i>' + m.txt + '<b>' + (dn[i] ? '달성' : GC + ' ' + NF(m.r)) + '</b></div>').join(''); }
     renderMercs();
     { const mk = $('mkt'); mk.innerHTML = ''; let open = 0;
       for (const m of MERCH) {
@@ -1540,7 +1558,7 @@
         const cost = shopCost(lv), maxed = lv >= 5;
         b.appendChild(cv);
         b.insertAdjacentHTML('beforeend', lv
-          ? '<div class="sh">' + m.shop + ' · Lv ' + lv + '</div><div class="n">' + m.name + '</div><div class="d">' + m.d(lv * m.per) + '</div>' + '<div class="c">' + (maxed ? '최대' : GC + ' ' + cost + ' 확장') + '</div>'
+          ? '<div class="sh">' + m.shop + ' · Lv ' + lv + '</div><div class="n">' + m.name + '</div><div class="d">' + m.d(lv * m.per) + '</div>' + '<div class="c">' + (maxed ? '최대' : GC + ' ' + NF(cost) + ' 확장') + '</div>'
           : '<div class="sh">' + m.shop + '</div><div class="n">셔터 내려짐</div><div class="d">남대문시장 창고에서 ' + josa(m.name, '을', '를') + ' 구하면 열려요</div>');
         if (lv && !maxed) { b.disabled = meta.coins < cost; b.addEventListener('click', () => { if (meta.coins < cost) return; meta.coins -= cost; meta.shops[m.id] = lv + 1; saveMeta(); initAudio(); beep(700, 0.12, 'sine', 0.05, 1100); renderMenu(); }); }
         mk.appendChild(b);
@@ -1549,8 +1567,10 @@
     const shop = $('shop'); shop.innerHTML = '';
     for (const it of ITEMS) {
       const have = ITM(it.id), b = document.createElement('button'); b.className = 'card item'; b.disabled = meta.coins < it.cost || have >= 99;
-      const ic = (ART.ready && ART.s[META_IC[it.id]]) ? '<img src="' + icon(META_IC[it.id]) + '" alt="">' : '';
-      b.innerHTML = ic + '<div class="n">' + it.name + ' <span style="font-size:11px;color:#ffd24a">1회용</span></div><div class="d">' + it.desc + '</div><div class="mp" style="font-size:12px;color:#e8dcc0">보유 <b>' + have + '</b>개</div><div class="c">' + GC + ' ' + it.cost + '</div>';
+      const ic = it.em ? '<div style="font-size:30px;line-height:1.1">' + it.em + '</div>' : (ART.ready && ART.s[META_IC[it.id]]) ? '<img src="' + icon(META_IC[it.id]) + '" alt="">' : '';
+      const on = (meta.use || {})[it.id] !== false;
+      b.innerHTML = ic + '<div class="n">' + it.name + ' <span style="font-size:11px;color:#ffd24a">1회용</span></div><div class="d">' + it.desc + '</div><div class="mp" style="font-size:12px;color:#e8dcc0">보유 <b>' + have + '</b>개' + (it.buff ? ' · <span class="use" style="display:inline-block;padding:1px 7px;border-radius:8px;border:1px solid ' + (on ? '#7dff9a;color:#7dff9a' : '#777;color:#999') + '">' + (on ? '가져가기 ON' : '가져가기 OFF') + '</span>' : '') + '</div><div class="c">' + GC + ' ' + NF(it.cost) + '</div>';
+      if (it.buff) b.querySelector('.use').addEventListener('click', (e) => { e.stopPropagation(); meta.use = meta.use || {}; meta.use[it.id] = !on; saveMeta(); renderMenu(); });
       b.addEventListener('click', () => { if (meta.coins < it.cost || have >= 99) return; meta.coins -= it.cost; meta.items = meta.items || {}; meta.items[it.id] = have + 1; saveMeta(); initAudio(); beep(700, 0.12, 'sine', 0.05, 1100); renderMenu(); });
       shop.appendChild(b);
     }
@@ -1560,7 +1580,7 @@
       const b = document.createElement('button'); b.className = 'card'; b.disabled = maxed || meta.coins < cost;
       let pips = ''; for (let k = 0; k < m.max; k++) pips += '<i class="' + (k < lv ? 'on' : '') + '"></i>';
       const ic = (ART.ready && ART.s[META_IC[m.id]]) ? '<img src="' + icon(META_IC[m.id]) + '" alt="">' : '';
-      b.innerHTML = ic + '<div class="n">' + m.name + '</div><div class="d">' + m.desc + '</div><div class="mp">' + pips + '</div><div class="c">' + (maxed ? '최대' : GC + ' ' + cost) + '</div>';
+      b.innerHTML = ic + '<div class="n">' + m.name + '</div><div class="d">' + m.desc + '</div><div class="mp">' + pips + '</div><div class="c">' + (maxed ? '최대' : GC + ' ' + NF(cost)) + '</div>';
       b.addEventListener('click', () => { if (meta.coins < cost || maxed) return; meta.coins -= cost; meta.up[m.id] = lv + 1; saveMeta(); initAudio(); beep(700, 0.12, 'sine', 0.05, 1100); renderMenu(); });
       shop.appendChild(b);
     }
@@ -1613,7 +1633,7 @@
   let choices = [];
   const L = (id) => (run && run.up[id]) || 0;
   const stat = {
-    dmg:    () => WD * (TR('beast') ? 0.85 : 1) * (1 + 0.25 * L('might')) * (1 + 0.06 * meta.up.dmg) * run.ch.dmg * (run.ch.pw || 1) * (run.rage > 0 ? 2 : 1) * (run.fz > 0 ? 2 : 1) * (run.ch.id === 'nox' ? 1 + Math.min(0.6, Math.floor(run.kills / 100) * 0.03) : 1) * (run.ch.lvdmg ? 1 + run.ch.lvdmg * (run.lvl - 1) : 1),
+    dmg:    () => WD * (BUF('drink') ? 1.3 : 1) * (TR('beast') ? 0.85 : 1) * (1 + 0.25 * L('might')) * (1 + 0.06 * meta.up.dmg) * run.ch.dmg * (run.ch.pw || 1) * (run.rage > 0 ? 2 : 1) * (run.fz > 0 ? 2 : 1) * (run.ch.id === 'nox' ? 1 + Math.min(0.6, Math.floor(run.kills / 100) * 0.03) : 1) * (run.ch.lvdmg ? 1 + run.ch.lvdmg * (run.lvl - 1) : 1),
     cd:     () => run.ch.cd / (1 + 0.14 * L('haste')) * (run.od > 0 ? 0.75 : 1),
     speed:  () => 150 * (1 + 0.12 * L('swift')) * (1 + 0.04 * meta.up.spd + SV('m_dosi')) * run.ch.spd,
     magnet: () => (TR('scatter') ? 38 + 8 * L('pull') : 64) * (1 + 0.5 * L('pull')) * (1 + 0.15 * meta.up.mag)
@@ -1688,12 +1708,13 @@
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
     const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
-    const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * (run.st.dmgMul || 1) * DIFF.dmg, xp: T.xp * (lvl || 1),
+    const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * (run.st.dmgMul || 1) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
     else if (type !== 'giant' && t > 110 && Math.random() < Math.min(0.28, (t - 110) / 560)) { e.fast = true; e.speed = Math.min(e.speed * 1.6, 178); }
     enemies.push(e); return e;
   }
+  for (const st of STAGES) { const q = STIER[st.id]; if (!q) continue; st.hpMul = q[0]; st.dmgMul = q[1]; st.coinMul = q[2]; st.dl = q[3]; if (st.id === 'bridge') st.minG = 4; if (st.id === 'end') st.minG = 5; st.desc = st.desc.replace(/적 체력 \+\d+%(, 통조림 \+\d+%)?/, '적 체력 +' + Math.round((q[0] - 1) * 100) + '% · 공격력 +' + Math.round((q[1] - 1) * 100) + '%').replace(' · 신화 미만 캐릭터는 적 체력 +60% 더', ''); }
   // 장소마다 좀비 구성이 달라요: [종류, 등장 시각, 기본 비중, 동시 최대]
   const MOBS = [['shade', 0, 0.24, 0], ['wisp', 25, 0.22, 0], ['bat', 35, 0.14, 0], ['skel', 0, 0.2, 0], ['frost', 0, 0.2, 0], ['crawler', 18, 0.05, 0], ['spitter', 50, 0.11, 8], ['brute', 70, 0.12, 0], ['charger', 95, 0.08, 5], ['bomber', 130, 0.09, 6], ['screamer', 65, 0.025, 2], ['leaper', 85, 0.04, 5], ['shield', 120, 0.035, 4]];
   const MIX = {
@@ -1990,7 +2011,7 @@
     let k = Math.max(0.2, 1 - 0.1 * L('armor') - (c.armor || 0) - 0.03 * (meta.up.def || 0) - SV('m_army'));
     if (c.id === 'knight' && player.hp < player.maxHp * 0.3) k *= 0.5;
     if (run.fz > 0) k *= 0.5;
-    player.hp -= dmg * k * (TR('bite') ? 1.55 : 1); player.inv = 0.85; run.hits = (run.hits || 0) + 1; shake = 8; hurtFlash = 0.4;
+    player.hp -= dmg * k * (TR('bite') ? 1.55 : 1) * (BUF('vest') ? 0.75 : 1); player.inv = 0.85; run.hits = (run.hits || 0) + 1; shake = 8; hurtFlash = 0.4;
     beep(140, 0.16, 'sawtooth', 0.06, 70);
     burst(player.x, player.y, 12, '#ff5a5a', 220);
     if (c.id === 'storm') run.later.push({ t: 0, f: () => { fx.push({ k: 'zap', x: player.x, y: player.y, t: 0, life: 0.25, seed: Math.random() * 100, s: null }); splash(player.x, player.y, 130, 30 * stat.dmg(), { col: '170,225,255', pc: '#cfeeff', kb: 280 }); } });
@@ -2280,7 +2301,7 @@
     { id: 'tkd', name: '태권도 사범 정씨', role: '근접 · 연타', cost: 900, kind: 'melee', hp: 260, soon: true, d: () => '빠른 발차기로 쉴 새 없이 때려요' },
     { id: 'weld', name: '용접공 오씨', role: '화염', cost: 1100, kind: 'shoot', hp: 240, soon: true, d: () => '용접 불꽃으로 앞쪽을 지져요' }];
   const mSp = (m) => 'm' + m.id;
-  const mercCost = (m, lv) => lv ? Math.round(m.cost * 4 * 0.75 * Math.pow(1.75, lv - 1)) : m.cost * 5;
+  const mercCost = (m, lv) => lv ? Math.round(m.cost * 4 * 0.75 * Math.pow(1.75, lv - 1) / 100) * 100 : m.cost * 5;
   function renderMercs() {
     meta.merc = meta.merc || { own: {}, sel: null }; const box = $('mercs'); if (!box) return; box.innerHTML = '';
     for (const m of MERCS) {
@@ -2292,7 +2313,7 @@
       b.insertAdjacentHTML('beforeend', '<div class="sh">' + m.role + (lv ? ' · Lv ' + lv : '') + '</div><div class="n">' + m.name + '</div><div class="d">' + m.d(Math.max(1, lv)) + '</div>');
       if (m.soon) { b.insertAdjacentHTML('beforeend', '<div class="mb"><span class="lk">🔒 곧 합류해요</span></div>'); box.appendChild(b); continue; }
       const mb = document.createElement('div'); mb.className = 'mb';
-      const buy = document.createElement('button'); buy.innerHTML = !lv ? GC + ' ' + cost + ' 고용' : maxed ? '최대' : GC + ' ' + cost + ' 강화'; buy.disabled = maxed || meta.coins < cost;
+      const buy = document.createElement('button'); buy.innerHTML = !lv ? GC + ' ' + NF(cost) + ' 고용' : maxed ? '최대' : GC + ' ' + NF(cost) + ' 강화'; buy.disabled = maxed || meta.coins < cost;
       buy.addEventListener('click', (e) => { e.stopPropagation(); if (maxed || meta.coins < cost) return; meta.coins -= cost; meta.merc.own[m.id] = lv + 1; if (!lv) meta.merc.sel = m.id; saveMeta(); initAudio(); beep(700, 0.12, 'sine', 0.05, 1100); renderMenu(); });
       mb.appendChild(buy);
       if (lv) { const go = document.createElement('button'); go.className = on ? 'go' : ''; go.textContent = on ? '✔ 데려가는 중' : '데려가기'; go.addEventListener('click', (e) => { e.stopPropagation(); meta.merc.sel = on ? null : m.id; saveMeta(); initAudio(); beep(520, 0.08, 'triangle', 0.04, 780); renderMenu(); }); mb.appendChild(go); }
@@ -2334,7 +2355,7 @@
     const M = run && run.merc; if (!M || state === 'menu') return;
     const hd0 = HD, sp = mSp(M.m); HD = M.hd;
     ctx.save(); if (M.st === 'down') ctx.globalAlpha = 0.45;
-    if (M.atk > 0 && M.st !== 'down' && ART.s[sp + '_a0']) { const fr = Math.min(3, Math.floor((0.42 - M.atk) / 0.105)); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(M.x, M.y + 15, 12, 5, 0, 0, TAU); ctx.fill(); const s0 = ART.s[sp + '_s0'], s1 = ART.s[sp + '_a' + fr]; spr(sp + '_a' + fr, M.x + M.face * (s1.width / s1.height - s0.width / s0.height) * 14, M.y - 11, 56, M.face < 0, 0); }
+    if (M.atk > 0 && M.st !== 'down' && ART.s[sp + '_a0']) { const fr = Math.min(3, Math.floor((0.42 - M.atk) / 0.105)); ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(M.x, M.y + 15, 12, 5, 0, 0, TAU); ctx.fill(); const s0 = ART.s[sp + '_s0'] || ART.s[sp + '_d0'], s1 = ART.s[sp + '_a' + Math.max(0, fr)]; if (s1) spr(sp + '_a' + Math.max(0, fr), M.x + (s0 ? M.face * (s1.width / s1.height - s0.width / s0.height) * 14 : 0), M.y - 11, 56, M.face < 0, 0); }
     else drawHero(ctx, sp, M.x, M.y, M.face, M.moveT, M.moving);
     ctx.restore(); HD = hd0;
     if (M.sw > 0) { ctx.strokeStyle = 'rgba(255,220,160,' + (M.sw * 3) + ')'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(M.x, M.y - 6, 70 + (0.25 - M.sw) * 80, 0, TAU); ctx.stroke(); }
@@ -3053,7 +3074,7 @@
       if (scat && !g.pull && (g.age = (g.age || 0) + dt) > 8 + 3 * L('pull') + 2 * L('bug')) { g.gone = true; continue; }
       const dx = player.x - g.x, dy = player.y - g.y, d = Math.hypot(dx, dy) || 1;
       if (g.pull || d < mag) { const s = g.pull ? 760 : 270 + (mag - d) * 4; g.x += dx / d * s * dt; g.y += dy / d * s * dt; }
-      if (d < 16) { run.xp += g.v * 1.45 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
+      if (d < 16) { run.xp += g.v * 1.45 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)) * (BUF('note') ? 1.4 : 1); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
     }
     if (gems.some((g) => g.gone)) gems = gems.filter((g) => !g.gone);
     if (gems.length > 420) { const g = gems.shift(); g.gone = true; gems[0].v += g.v; gems[0].big = true; }
@@ -3241,7 +3262,7 @@
     $('overSub').textContent = won ? '보스 「' + run.finName + '」 처치! ' + run.st.name + '에 첫차가 들어왔어요.' : run.finalT !== null ? '최종 보스 앞에서 쓰러졌어요. 강화하고 다시 도전해 보세요.' : '모은 골드로 강화하고 다시 도전해 보세요.';
     $('stars').innerHTML = won ? [0, 1, 2].map((k) => k < stars ? '<span style="animation-delay:' + (0.3 + k * 0.25) + 's">★</span>' : '<i>★</i>').join('') + '<small>클리어 · 체력 절반 이상 · 1분 안에 처치</small>' : '';
     $('sTime').textContent = fmt(run.t); $('sKills').textContent = run.kills; $('sLv').textContent = run.lvl;
-    $('sCoins').textContent = '+' + earned; $('misBox').innerHTML = mNew.map((t) => '<div>' + t + '</div>').join('');
+    $('sCoins').textContent = '+' + NF(earned); $('misBox').innerHTML = mNew.map((t) => '<div>' + t + '</div>').join('');
     const si = STAGES.findIndex((x) => x.id === run.st.id), nx = won ? (run.sub < 5 ? STAGES[si] : STAGES[si + 1]) : null; $('nextBtn').textContent = run.sub < 5 ? '다음 스테이지 ▶' : '다음 장소 ▶';
     $('nextMap').classList.toggle('hidden', !nx); $('nextBtn').classList.toggle('hidden', !nx); $('againBtn').classList.toggle('hidden', won); run.next = nx ? nx.id : null;
     if (nx) { stageThumb($('nextCv'), nx); $('nextLab').textContent = fresh.includes(nx.name) ? '🔓 새 장소가 열렸어요!' : run.sub < 5 ? '다음 스테이지 ' + stCode(nx.id) : '다음 장소'; $('nextName').textContent = nx.name; $('nextDesc').textContent = nx.desc; }
@@ -3264,7 +3285,9 @@
   function endCall() { if (state !== 'call') return; $('callOv').classList.add('hidden'); state = 'play'; prev = performance.now(); }
   $('callOv').addEventListener('click', endCall);
   function startRun() {
-    initAudio(); newRun(); state = 'play'; if (STRAIT[run.st.id]) run.later.push({ t: 2.5, f: () => banner(STRAIT[run.st.id].map((k) => TRAITS[k][0] + ': ' + TRAITS[k][2]).join(' / ')) }); $('gearBtn').classList.add('hidden'); $('rankBtn').classList.add('hidden'); $('shareBtn').classList.add('hidden'); showCall();
+    initAudio(); newRun(); state = 'play';
+    { run.bf = {}; const got = []; for (const it of ITEMS) if (it.buff && ITM(it.id) > 0 && (meta.use || {})[it.id] !== false) { run.bf[it.id.slice(2)] = 1; meta.items[it.id] = ITM(it.id) - 1; got.push(it.em + ' ' + it.name); }
+      if (got.length) { saveMeta(); if (run.bf.food) { player.maxHp = Math.round(player.maxHp * 1.4); player.hp = player.maxHp; } if (run.bf.treat) grant(['cat', 'owl', 'dragon', 'bug'][Math.floor(Math.random() * 4)], 2); if (run.bf.charm) { const q = (UQ[run.ch.id] || [])[Math.floor(Math.random() * 2)]; if (q) grant(q[0], 2); run.rerolls += 2; } run.later.push({ t: 1.2, f: () => banner('가져간 아이템: ' + got.join(' · ')) }); } } if (STRAIT[run.st.id]) run.later.push({ t: 2.5, f: () => banner(STRAIT[run.st.id].map((k) => TRAITS[k][0] + ': ' + TRAITS[k][2]).join(' / ')) }); $('gearBtn').classList.add('hidden'); $('rankBtn').classList.add('hidden'); $('shareBtn').classList.add('hidden'); showCall();
     $('menu').classList.add('hidden'); $('over').classList.add('hidden'); $('levelup').classList.add('hidden'); $('hud').classList.remove('hidden');
   }
   let pausedFrom = null;
@@ -4036,7 +4059,7 @@ else if (f.k === 'rays') {
     $('time').textContent = run.finalT !== null ? '최종 보스' : fmt(run.t);
     { const gl = run.clearT !== null ? '첫차가 들어와요' : run.finalT !== null ? '쓰러뜨려야 탈 수 있어요' : '보스까지 ' + fmt(Math.max(0, WIN_TIME - run.t)); if ($('goal').textContent !== gl) $('goal').textContent = gl; }
     $('lv').textContent = 'LV ' + run.lvl;
-    $('earnNow').textContent = coinsNow();
+    $('earnNow').textContent = NF(coinsNow());
     $('xpbar').firstElementChild.style.width = clamp(run.xp / run.xpNext, 0, 1) * 100 + '%';
     const hr = clamp(player.hp / player.maxHp, 0, 1);
     $('hpbar').firstElementChild.style.width = hr * 100 + '%'; $('hpbar').classList.toggle('low', hr < 0.3);
