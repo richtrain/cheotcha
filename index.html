@@ -348,7 +348,7 @@
     <div id="xpbar"><i></i></div>
     <div id="topbar">
       <div><div id="me"><canvas id="face" width="92" height="92"></canvas><div id="meR"><div id="lv">LV 1</div><div id="hpbar"><i></i><div id="hptext"></div></div></div></div><div id="goldL"><svg class="gc" viewBox="0 0 20 20" width="1em" height="1em" style="vertical-align:-0.15em"><circle cx="10" cy="10" r="9" fill="#b8770a"/><circle cx="10" cy="9.2" r="8.2" fill="#ffc933"/><circle cx="10" cy="9.2" r="6" fill="#ffdf6b" stroke="#d6940f" stroke-width="1"/><path d="M12.6 7.2a3 3 0 1 0 .3 3.6h-2.6" fill="none" stroke="#a86a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.2 6.2a6 6 0 0 1 3-2.6" fill="none" stroke="#fff6c9" stroke-width="1.2" stroke-linecap="round"/></svg> <b id="earnNow">0</b> 골드</div></div>
-      <div><div id="time">0:00</div><div id="goal">30초마다 보스 · 2분 30초 최종 보스</div></div>
+      <div><div id="time">0:00</div><div id="goal">40초마다 보스 · 2분 30초 최종 보스</div></div>
       <div id="right"></div>
     </div>
     <div id="owned"></div>
@@ -1721,7 +1721,7 @@
   function newRun() {
     const chr = CHARS.find((c) => c.id === meta.sel.char) || CHARS[0], st0 = STAGES.find((s) => s.id === meta.sel.stage) || STAGES[0], sub = curSub(st0.id), st = Object.assign({}, st0, { xpMul: Math.pow(st0.hpMul, 0.08) });
     run = { t: 0, kills: 0, bossKills: 0, lvl: 1, xp: 0, xpNext: 10, up: { [chr.start]: 1 },
-            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 30, bossLvl: 0, won: false,
+            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 40, bossLvl: 0, won: false,
             ch: chr, st, rerolls: ITM('reroll'), face: 1, moveT: 0, moving: false,
             pets: { bug: { x: 0, y: -30, target: null }, owl: { x: -20, y: -34, cd: 1, target: null }, cat: { x: -22, y: 8, cd: 10, face: 1 }, dragon: { x: 20, y: -30, cd: 1.5, face: 1 } } };
     const hp = chr.hp + meta.up.hp * 10 + SV('m_kal');
@@ -3223,7 +3223,7 @@
       run.spawnT = Math.max(0.25, 0.6 - td * 0.0012) * (td < 25 ? 0.8 : 1) * [1, 1.2, 1.08, 1, 0.95, 0.9, 0.85][run.st.dl || 1];
     }
     if (run.t >= run.nextBoss && run.t < WIN_TIME - 12) {
-      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 30;
+      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 40;
       banner('⚠ ' + BOSS_NAMES[Math.min(3, run.bossLvl - 1)] + ' 등장'); beep(110, 0.6, 'sawtooth', 0.06, 220); shake = 8;
     }
     // 정예, 돌발 사건, 최종 보스
