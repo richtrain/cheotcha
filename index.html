@@ -1860,10 +1860,11 @@
     run.awake[id] = true; banner('✦✦ 각성: ' + tn(id, 3) + ' ✦✦'); tierFx(id, 3); renderOwned();
   }
   function openChest() {
-    const c = Object.keys(run.up).filter((id) => TN[id] && L(id) < capOf(id));
     burst(player.x, player.y, 20, '#ffd24a', 240);
-    if (c.length) { const id = c.includes(run.ch.start) ? run.ch.start : c[Math.floor(Math.random() * c.length)]; grant(id, 1); renderOwned(); if (run.evoQ.length) { if (fastSpin) setPath(run.evoQ.shift(), 'a'); else offerEvo(run.evoQ.shift()); } else if (run.specQ && run.specQ.length) { const q = run.specQ.shift(); if (fastSpin) setSpec(q.id, q.k, 0); else offerSpec(q); } }
-    else { run.xp += run.xpNext; nums.push({ x: player.x, y: player.y - 24, v: 'LEVEL UP', t: 0, crit: true }); }
+    const h = player.maxHp * 0.25, xp = Math.round(run.xpNext * 0.35), c = Math.round(15 * (run.st.coinMul || 1));
+    player.hp = Math.min(player.maxHp, player.hp + h); run.xp += xp; run.bonus = (run.bonus || 0) + c;
+    nums.push({ x: player.x, y: player.y - 24, v: '보물 상자! 체력 +' + Math.round(h) + ' · 경험치 +' + xp, t: -0.4, crit: true });
+    beep(880, 0.15, 'triangle', 0.05, 1320);
   }
   // 맵 아이템
   const MAPR = 1250;   // 맵 한 변의 절반
