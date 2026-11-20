@@ -849,7 +849,7 @@
       c.pw = b[2] / shown * Math.sqrt(b[0] / c.hp); c.dmg = shown; } }
   const TRAITS = { bite: ['🦷 맹공', '좀비 공격력 +55%', '체력·갑옷·비타민을 챙기세요'], iron: ['🛡️ 철갑', '좀비가 받는 피해 -58% · 치명타는 철갑을 뚫어요', '근력 운동·급소 노리기 한 단계마다 철갑 12% 관통'], horde: ['🧟 떼거리', '빠른 좀비가 1.5배 몰려와요(대신 조금 약하고 통조림이 적어요)', '반려동물이 큰 도움이 돼요'], scatter: ['📦 흩어진 보급', '통조림이 8초 뒤 사라지고 줍는 범위 -40%', '자석 집게(+3초)·배달 드론(+2초)이 통조림을 오래 남게 해요'], beast: ['🐾 동물의 밤', '반려동물 피해 +80% · 내 공격 피해 -15%', '반려동물을 꼭 데려가세요'] };
   const STRAIT = { forest: ['horde'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], mall: ['scatter', 'bite'], stadium: ['beast', 'iron'], bridge: ['bite', 'horde'], gwang: ['horde', 'iron'], end: ['iron', 'bite'] };
-  const DIFF = { hp: 1.15, dmg: 1.2 };   // 전체 난이도
+  const DIFF = { hp: 1.0, dmg: 1.2 };   // 전체 난이도
   const TR = (k) => !!(run && run.st && STRAIT[run.st.id] && STRAIT[run.st.id].includes(k));
   const GPRICE = [0, 2000, 5000, 10000, 30000, 100000]; for (const c of CHARS) if (c.price) c.price = GPRICE[c.g];
   const HERO = {
@@ -879,7 +879,7 @@
     { id: 'gold',   name: '욕심쟁이',    desc: '골드 획득 +8%', max: 5 },
     { id: 'revive', name: '두 번째 심지', desc: '판마다 한 번 부활', max: 1, mul: 16 }
   ];
-  const WD = 1.6, WR = (x) => Math.round(x * WD);   // 무기 피해 기본 배율
+  const WD = 1.9, WR = (x) => Math.round(x * WD);   // 무기 피해 기본 배율
   const UPS = {
     bolt:   { icon: '✦', name: '빛탄',       kind: 'w', max: 5, desc: '가까운 적을 쏘고, 맞은 자리가 터져요.',           st: (l) => '피해 ' + WR(12 + 4 * l) + ' · ' + (1 + Math.floor(l / 2)) + '발' },
     orbit:  { icon: '◎', name: '도는 불씨',   kind: 'w', max: 5, desc: '불씨가 내 주위를 돌며 닿는 적을 태워요.',   st: (l) => '피해 ' + WR(8 + 3 * l) + ' · 불씨 ' + (1 + l) + '개' },
@@ -1773,7 +1773,7 @@
   // ---------- 적 ----------
   function spawn(type, x, y, lvl) {
     const T = TYPES[type], t = run.t * DK;
-    const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.72) * run.st.hpMul;
+    const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5) * run.st.hpMul;
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
     const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
@@ -2263,7 +2263,7 @@
     const take = (arr) => { const a = arr.filter((x) => !choices.some((c) => c.id === x)); if (!a.length) return false; choices.push({ id: rnd(a), n: 1 }); return true; };
     const skw = []; for (const x of sk) for (let k = 0; k < 8 - L(x); k++) skw.push(x);
     for (const x of myS) if (uGated(x)) { const q = UREQ[x][L(x) < 3 ? 0 : 1]; if (pool.includes(q)) for (let k = 0; k < 8 - L(x); k++) skw.push('#' + q); }
-    if ((skw.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.6)) { run.skMiss = 0; if (skw.length) { const p = rnd(skw); choices.push({ id: p[0] === '#' ? p.slice(1) : p, n: 1 }); } else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
+    if ((skw.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.75)) { run.skMiss = 0; if (skw.length) { const p = rnd(skw); choices.push({ id: p[0] === '#' ? p.slice(1) : p, n: 1 }); } else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
     if (need.length && Math.random() < 0.75) take(need);
     if (choices.length < 3) take(st);
     if (choices.length < 3) { const ptw = run.ch.id === 'nyang' && pt.includes('cat') ? pt.concat(['cat', 'cat']) : pt; if (!((Math.random() < 0.6 || !st.length) && take(ptw))) take(st); }
@@ -2376,7 +2376,7 @@
   function checkLevel() {
     while (state === 'play' && run.xp >= run.xpNext) {
       run.xp -= run.xpNext; run.lvl++;
-      run.xpNext = Math.floor(10 + run.lvl * 9 + run.lvl * run.lvl * 2.2);
+      run.xpNext = Math.floor(8 + run.lvl * 6 + run.lvl * run.lvl * 1.1);
       fx.push({ k: 'pillar', x: player.x, y: player.y, w: 56, t: 0, life: 0.6, col: '255,228,160' }); burst(player.x, player.y, 14, '#ffe08a', 170);
       beep(520, 0.1, 'triangle', 0.05, 780); setTimeout(() => beep(780, 0.14, 'triangle', 0.05, 1170), 90);
       if (offerChoices()) break;
@@ -3180,7 +3180,7 @@
       if (scat && !g.pull && (g.age = (g.age || 0) + dt) > 8 + 3 * L('pull') + 2 * L('bug')) { g.gone = true; continue; }
       const dx = player.x - g.x, dy = player.y - g.y, d = Math.hypot(dx, dy) || 1;
       if (g.pull || d < mag) { const s = g.pull ? 760 : 270 + (mag - d) * 4; g.x += dx / d * s * dt; g.y += dy / d * s * dt; }
-      if (d < 16) { run.xp += g.v * 1.45 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)) * (BUF('note') ? 1.4 : 1); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
+      if (d < 16) { run.xp += g.v * 2.2 * run.st.xpMul * (run.moon > 0 ? 2 : 1) * (run.ch.xp || 1) * (1 + 0.04 * (meta.up.xp || 0)) * (BUF('note') ? 1.4 : 1); g.gone = true; if (gtime - lastHitSfx > 0.03) beep(1000 + Math.min(600, run.xp * 8), 0.05, 'sine', 0.022); }
     }
     if (gems.some((g) => g.gone)) gems = gems.filter((g) => !g.gone);
     if (gems.length > 420) { const g = gems.shift(); g.gone = true; gems[0].v += g.v; gems[0].big = true; }
