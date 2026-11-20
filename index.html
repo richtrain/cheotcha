@@ -2262,8 +2262,8 @@
     const st = pool.filter((x) => UPS[x].kind === 'p'), pt = pool.filter((x) => UPS[x].kind === 'pet'), need = uNeeds().filter((x) => pool.includes(x));
     const take = (arr) => { const a = arr.filter((x) => !choices.some((c) => c.id === x)); if (!a.length) return false; choices.push({ id: rnd(a), n: 1 }); return true; };
     const skw = []; for (const x of sk) for (let k = 0; k < 8 - L(x); k++) skw.push(x);
-    for (const x of myS) if (uGated(x)) { const q = UREQ[x][L(x) < 3 ? 0 : 1]; if (pool.includes(q)) for (let k = 0; k < 8 - L(x); k++) skw.push('#' + q); }
-    if ((skw.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.75)) { run.skMiss = 0; if (skw.length) { const p = rnd(skw); choices.push({ id: p[0] === '#' ? p.slice(1) : p, n: 1 }); } else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
+    for (const x of myS) if (uGated(x)) for (let k = 0; k < 8 - L(x); k++) skw.push(x);
+    if ((skw.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.75)) { run.skMiss = 0; if (skw.length) { const p = rnd(skw); if (uGated(p)) { const q = UREQ[p][L(p) < 3 ? 0 : 1]; choices.push({ id: p, n: 1, locked: true, key: q }); if (pool.includes(q)) take([q]); } else choices.push({ id: p, n: 1 }); } else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
     if (need.length && Math.random() < 0.75) take(need);
     if (choices.length < 3) take(st);
     if (choices.length < 3) { const ptw = run.ch.id === 'nyang' && pt.includes('cat') ? pt.concat(['cat', 'cat']) : pt; if (!((Math.random() < 0.6 || !st.length) && take(ptw))) take(st); }
@@ -2272,6 +2272,9 @@
     lvHead('LEVEL UP', '하나를 고르세요', true);
     const box = $('cards'); box.innerHTML = '';
     choices.forEach((c, i) => {
+      if (c.locked) { const id = c.id, nx = L(id) + 1, need = nx >= 5 ? 3 : 2, b = document.createElement('button'); b.className = 'u'; b.style.cssText = 'filter:grayscale(.85) brightness(.75);border-style:dashed;cursor:not-allowed';
+        b.innerHTML = '<div class="k">' + (i + 1) + '</div><div class="ic"><img src="' + uIcon(id, nx) + '" alt=""></div><div class="rb">🔒 잠김</div><div class="n">' + uName(id, nx) + '</div><div class="st"><b>' + (nx >= 5 ? '각성' : '진화') + '하려면<br>' + UPS[c.key].name + ' Lv' + need + ' 필요</b><br>(지금 Lv' + L(c.key) + ')</div><div class="d">이번엔 고를 수 없어요. 옆의 🔑 카드로 조건을 채우세요.</div>';
+        b.addEventListener('click', () => pick(i)); box.appendChild(b); return; }
       if (c.tx) { const id = c.id, k = ((run.utx || {})[id] || 0) + 1, nm = UPS[id].kind === 'u' ? uName(id, 7) : tn(id, tierX(id)); const b = document.createElement('button'); b.className = 'u evo';
         b.innerHTML = '<div class="shine"></div><div class="k">' + (i + 1) + '</div><div class="ic"><span class="halo"></span>' + upIcon(id, L(id)) + '</div><div class="rb">★ 초월 강화 ' + k + ' ★</div><div class="n">' + nm + ' +' + k + '</div><div class="st"><b>피해 +' + 20 * k + '%</b></div><div class="d">다 키운 고유 스킬을 더 세게 만들어요. 최대 +10.</div>';
         b.addEventListener('click', () => pick(i)); box.appendChild(b); return; }
@@ -2313,6 +2316,7 @@
     if (state !== 'levelup' || spinning) return;
     if (i === 3) return;
     const c = choices[i]; if (!c) return;
+    if (c.locked) { try { toast('🔒 ' + UPS[c.key].name + '을(를) 먼저 Lv' + (L(c.id) + 1 >= 5 ? 3 : 2) + '까지 올려야 해요'); } catch (e) {} beep(200, 0.12, 'square', 0.03, 150); return; }
     if (c.tx || c.ubr) {
       const done = () => { if (c.tx) { (run.utx = run.utx || {})[c.id] = ((run.utx || {})[c.id] || 0) + 1; banner('✦ 초월: ' + (UPS[c.id].kind === 'u' ? uName(c.id, 7) : tn(c.id, tierX(c.id))) + ' +' + run.utx[c.id] + ' ✦'); } else { (run.ubr = run.ubr || {})[c.id] = c.ubr; banner('✦ ' + uName(c.id, 3) + ' · ' + (c.ubr === 'a' ? '한 방형' : '연사형') + ' ✦'); } closeLevel(); };
       if (fastSpin) { done(); return; }
