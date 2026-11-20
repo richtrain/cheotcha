@@ -1172,6 +1172,13 @@
     x_bite: (l) => '피해 ' + (30 + 12 * l) + ' · 회복 ' + (3 + l), x_roar: (l) => '피해 ' + (16 + 7 * l) + ' · 멈춤 ' + (0.8 + 0.1 * l).toFixed(1) + '초'
   };
   for (const cid in UQ) for (const [id, ics, nms, desc, cd, em] of UQ[cid]) UPS[id] = { icon: ics[0], ics, name: nms[0], nms, em: em || ics, desc, kind: 'u', max: 5, ch: cid, cd0: cd, st: UST[id] };
+  const UREQ = { k_cup: ['regen', 'dragon'], k_bar: ['crit', 'owl'], s_chain: ['haste', 'dragon'], s_field: ['armor', 'bug'], w_dash: ['swift', 'owl'], w_spike: ['vital', 'cat'],
+    r_bag: ['luck', 'bug'], r_horn: ['vital', 'cat'], a_acid: ['regen', 'dragon'], a_chain: ['might', 'bug'], m_iai: ['crit', 'owl'], m_kihap: ['armor', 'cat'], g_aed: ['haste', 'owl'], g_iv: ['vital', 'cat'],
+    n_virus: ['regen', 'bug'], n_mut: ['vital', 'dragon'], c_wrap: ['armor', 'cat'], c_sale: ['luck', 'bug'], j_chip: ['crit', 'dragon'], j_fan: ['haste', 'bug'], b_red: ['regen', 'cat'], b_bag: ['luck', 'owl'],
+    e_sat: ['crit', 'bug'], e_drone: ['haste', 'dragon'], k_wok: ['vital', 'cat'], k_chili: ['might', 'dragon'], o_card: ['crit', 'owl'], o_dice: ['luck', 'bug'], y_paw: ['crit', 'cat'], y_mack: ['might', 'owl'], x_bite: ['regen', 'cat'], x_roar: ['armor', 'dragon'] };
+  const uCap = (id) => { const q = UREQ[id]; if (!q) return 5; return L(q[0]) < 2 ? 2 : L(q[1]) < 3 ? 4 : 5; };
+  const uGated = (id) => UPS[id].kind === 'u' && L(id) > 0 && L(id) < 5 && L(id) >= uCap(id);
+  const uNeeds = () => (UQ[run.ch.id] || []).map((q) => q[0]).filter(uGated).map((id) => UREQ[id][L(id) < 3 ? 0 : 1]);
   const uT = (lv) => lv >= 5 ? 2 : lv >= 3 ? 1 : 0, uName = (id, lv) => UPS[id].nms[Math.max(0, Math.min(4, lv - 1))];
   const EMO = new Map();
   function emoSpr(e) { let c = EMO.get(e); if (!c) { c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); g.font = '46px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 32, 35); EMO.set(e, c); } return c; }
@@ -1500,7 +1507,7 @@
     $('showInfo').innerHTML = '<div class="gr" style="color:' + GCOL[ch.g] + '">' + GSTAR(ch) + ' ' + GRADE[ch.g] + '</div><div class="nm">' + ch.name + '</div><div class="tt">' + ch.title + (ch.style ? ' · <b style="color:#8fe9ff">' + ch.style + '</b>' : '') + '</div><div class="lore">“' + ch.lore + '”</div>' + (UQ[ch.id] ? '<div class="sig"><b>고유 스킬</b> ' + tn(ch.start, 0, false) + ' · ' + UQ[ch.id].map((q) => q[1][0] + ' ' + q[2][0]).join(' · ') + '</div>' : '') + '<div class="bars"><span>체력</span>' + bar(ch.hp / 240)
       + '<span>공격</span>' + bar(ch.dmg / 2.3) + '<span>속도</span>' + bar((ch.spd - 0.75) / 0.52) + '</div>';
     const sbest = ms.best[stg.id];
-    $('showStage').innerHTML = '<div class="rec" style="font-weight:800;font-size:14px">' + SSTAR(stg) + ' <span style="color:' + (SDN(stg) >= 5 ? '#ff5a6a' : '#e8dcc0') + '">' + SDL[SDN(stg) - 1] + '</span></div>' + (stg.dl >= 5 ? '<div class="rec" style="color:#ff7a8a">' + DLAB[stg.dl][2] + '</div>' : '') + (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span>' + (sbest ? '<div class="rec">최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' · 클리어' : '') + '</div>' : '');
+    $('showStage').innerHTML = '<div class="rec" style="font-weight:800;font-size:14px">' + SSTAR(stg) + ' <span style="color:' + (SDN(stg) >= 5 ? '#ff5a6a' : '#e8dcc0') + '">' + SDL[SDN(stg) - 1] + '</span></div>' + (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span>' + (sbest ? '<div class="rec">최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' · 클리어' : '') + '</div>' : '');
     $('wlab').innerHTML = '시작 무기 <b>' + tn(ch.start, 0, false) + '</b> → ' + tn(ch.start, 3, false);
     $('wroad').innerHTML = [0, 1, 2, 3].map((k) => '<span title="' + TN[ch.start][k] + '">' + tierIcon(ch.start, k) + '</span>').join('<em>›</em>');
     const cb = $('chars'); cb.innerHTML = '';
@@ -2136,11 +2143,14 @@
   function poolNow() {
     const cnt = { w: 0, p: 0, pet: 0, u: 0 };
     for (const id in run.up) cnt[UPS[id].kind]++;
-    return Object.keys(UPS).filter((id) => L(id) < capOf(id) && (L(id) > 0 || cnt[UPS[id].kind] < SLOTS[UPS[id].kind]) && canUse(id) && (!UPS[id].ch || UPS[id].ch === run.ch.id));
+    return Object.keys(UPS).filter((id) => L(id) < capOf(id) && (L(id) > 0 || cnt[UPS[id].kind] < SLOTS[UPS[id].kind]) && canUse(id) && (!UPS[id].ch || UPS[id].ch === run.ch.id) && !uGated(id));
   }
   function grant(id, n) {
-    const u = UPS[id], was = L(id), now = Math.min(capOf(id), was + n);
+    const u = UPS[id], was = L(id), now = Math.max(was, Math.min(capOf(id), u.kind === 'u' ? uCap(id) : 99, was + n));
     if (now === was) return 0;
+    const myU = (UQ[run.ch.id] || []).map((q) => q[0]), gb = myU.map(uGated);
+    if (u.kind === 'p' || u.kind === 'pet') { const h = player.maxHp * 0.1; player.hp = Math.min(player.maxHp, player.hp + h); }
+    run.later.push({ t: 0.05, f: () => myU.forEach((q, i) => { if (gb[i] && !uGated(q)) { banner('🔓 ' + uName(q, L(q) + 1) + ' ' + (L(q) < 3 ? '진화' : '각성') + ' 가능!'); beep(988, 0.15, 'triangle', 0.05, 1480); } }) });
     run.up[id] = now;
     if (id === 'vital') { player.maxHp += 45 * (now - was); player.hp = Math.min(player.maxHp, player.hp + 45 * (now - was)); }
     if (u.kind === 'u' && was < 3 && now >= 3) (run.ubrQ = run.ubrQ || []).push(id);
@@ -2161,10 +2171,12 @@
     choices = [];
     const myS = [run.ch.start].concat((UQ[run.ch.id] || []).map((q) => q[0]));
     const sk = pool.filter((x) => myS.includes(x)), txs = myS.filter((x) => L(x) > 0 && L(x) >= capOf(x) && ((run.utx || {})[x] || 0) < 10);
-    const st = pool.filter((x) => UPS[x].kind === 'p'), pt = pool.filter((x) => UPS[x].kind === 'pet');
-    if (sk.length) choices.push({ id: rnd(sk), n: 1 }); else if (txs.length) choices.push({ id: rnd(txs), n: 1, tx: true });
-    if (st.length) { const id = rnd(st); choices.push({ id, n: 1 }); st.splice(st.indexOf(id), 1); }
-    { const ptw = run.ch.id === 'nyang' && pt.includes('cat') ? pt.concat(['cat', 'cat']) : pt; const third = ptw.length && (Math.random() < 0.65 || !st.length) ? rnd(ptw) : st.length ? rnd(st) : null; if (third) choices.push({ id: third, n: 1 }); }
+    const st = pool.filter((x) => UPS[x].kind === 'p'), pt = pool.filter((x) => UPS[x].kind === 'pet'), need = uNeeds().filter((x) => pool.includes(x));
+    const take = (arr) => { const a = arr.filter((x) => !choices.some((c) => c.id === x)); if (!a.length) return false; choices.push({ id: rnd(a), n: 1 }); return true; };
+    if ((sk.length || txs.length) && ((run.skMiss || 0) >= 1 || Math.random() < 0.6)) { run.skMiss = 0; if (sk.length) choices.push({ id: rnd(sk), n: 1 }); else choices.push({ id: rnd(txs), n: 1, tx: true }); } else run.skMiss = (run.skMiss || 0) + 1;
+    if (need.length && Math.random() < 0.75) take(need);
+    if (choices.length < 3) take(st);
+    if (choices.length < 3) { const ptw = run.ch.id === 'nyang' && pt.includes('cat') ? pt.concat(['cat', 'cat']) : pt; if (!((Math.random() < 0.6 || !st.length) && take(ptw))) take(st); }
     while (choices.length < 3) { const rest = pool.filter((x) => !choices.some((c) => c.id === x)); if (!rest.length) break; choices.push({ id: rnd(rest), n: 1 }); }
     if (!choices.length) { player.hp = Math.min(player.maxHp, player.hp + 30); return false; }
     lvHead('LEVEL UP', '하나를 고르세요', true);
@@ -2187,7 +2199,7 @@
           : t1 >= TMAX ? '<div class="pk">최고 단계</div>' : (t1 === 1 && !run.path[id]) ? '<div class="pk">다음 ▸ Lv' + (nx + 1) + ' 진화 선택<br><b>' + TN[id][2] + '</b> / <b>' + TN2[id][0] + '</b></div>' : '<div class="pk">다음 ▸ Lv' + (nx + 1) + ' <b>' + TLAB[t1 + 1] + '</b> ' + tn(id, t1 + 1) + '<br>' + tp(id, t1 + 1) + '</div>';
         tail = (lv ? '' : '<div class="d">' + u.desc + '</div>') + road + pk + rk;
         if (COMBO[id]) tail += '<div class="pk"' + (comboOn(id) ? ' style="color:#ffd24a"' : '') + '>조합 ▸ Lv5(초월) + ' + UPS[COMBO[id][0]].name + ' Lv3 = <b>' + COMBO[id][1] + '</b></div>';
-      } else { if (u.kind === 'u') { tail += '<div class="road">' + [0, 1, 2, 3, 4].map((k) => '<span class="' + (k < nx - 1 ? 'got' : k === nx - 1 ? 'got now' : k === nx ? 'nxt' : 'lock') + '" title="' + u.nms[k] + '">' + u.ics[uT(k + 1)] + '</span>').join('<em>›</em>') + '</div>'; tail += '<div class="pk' + (nx === 3 || nx === 5 ? ' hot' : '') + '">' + (nx === 3 ? '✦ 진화: 피해 +30% · 금빛으로 변해요' : nx === 5 ? '✦ 각성: 피해 +60% · 두 번 연속 발동 · 분홍빛' : nx < 5 ? '다음 ▸ Lv' + (nx + 1) + ' <b>' + u.nms[nx] + '</b>' + (nx + 1 === 3 ? ' (진화)' : nx + 1 === 5 ? ' (각성)' : '') : '최고 단계') + '</div><div class="pk" style="color:#ff9ad8">★ ' + run.ch.name + ' 전용 고유 스킬</div>'; } if (id === 'cat' && run.ch.id === 'nyang') tail += '<div class="pk" style="color:#ffb0d8">💞 나비와 단짝 ▸ 더 자주 물고, 문 좀비를 나비가 할퀴면 피해 2배</div>'; const cw = Object.keys(run.up).filter((w) => COMBO[w] && COMBO[w][0] === id && !comboOn(w)); if (cw.length) tail += '<div class="pk">조합 ▸ Lv3이면 ' + cw.map((w) => '<b>' + COMBO[w][1] + '</b>(' + UPS[w].name + ')').join(', ') + '</div>'; }
+      } else { if (u.kind === 'p' || u.kind === 'pet') { const ks = (UQ[run.ch.id] || []).map((q) => q[0]).filter((s2) => UREQ[s2] && L(s2) > 0 && L(s2) < 5 && ((UREQ[s2][0] === id && L(s2) < 3) || (UREQ[s2][1] === id && L(s2) >= 3))); if (ks.length) tail += '<div class="pk hot" style="color:#ffd27a">🔑 ' + ks.map((s2) => uName(s2, L(s2)) + (L(s2) < 3 ? ' 진화' : ' 각성') + ' 조건').join(', ') + '</div>'; tail += '<div class="pk" style="color:#8ff0a0">고르면 체력 10% 회복</div>'; } if (u.kind === 'u') { tail += '<div class="road">' + [0, 1, 2, 3, 4].map((k) => '<span class="' + (k < nx - 1 ? 'got' : k === nx - 1 ? 'got now' : k === nx ? 'nxt' : 'lock') + '" title="' + u.nms[k] + '">' + u.ics[uT(k + 1)] + '</span>').join('<em>›</em>') + '</div>'; tail += '<div class="pk' + (nx === 3 || nx === 5 ? ' hot' : '') + '">' + (nx === 3 ? '✦ 진화: 피해 +30% · 금빛으로 변해요' : nx === 5 ? '✦ 각성: 피해 +60% · 두 번 연속 발동 · 분홍빛' : nx < 5 ? '다음 ▸ Lv' + (nx + 1) + ' <b>' + u.nms[nx] + '</b>' + (nx + 1 === 3 ? ' (진화)' : nx + 1 === 5 ? ' (각성)' : '') : '최고 단계') + '</div><div class="pk" style="color:#ff9ad8">★ ' + run.ch.name + ' 전용 고유 스킬</div>' + (UREQ[id] && (nx === 2 || nx === 4) ? '<div class="pk" style="color:#ffd27a">🔒 Lv' + (nx + 1) + ' ' + (nx === 2 ? '진화' : '각성') + ' 조건: ' + UPS[UREQ[id][nx === 2 ? 0 : 1]].name + ' Lv' + (nx === 2 ? 2 : 3) + (L(UREQ[id][nx === 2 ? 0 : 1]) >= (nx === 2 ? 2 : 3) ? ' ✔' : '') + '</div>' : ''); } if (id === 'cat' && run.ch.id === 'nyang') tail += '<div class="pk" style="color:#ffb0d8">💞 나비와 단짝 ▸ 더 자주 물고, 문 좀비를 나비가 할퀴면 피해 2배</div>'; const cw = Object.keys(run.up).filter((w) => COMBO[w] && COMBO[w][0] === id && !comboOn(w)); if (cw.length) tail += '<div class="pk">조합 ▸ Lv3이면 ' + cw.map((w) => '<b>' + COMBO[w][1] + '</b>(' + UPS[w].name + ')').join(', ') + '</div>'; }
       b.innerHTML = '<div class="shine"></div><div class="k">' + (i + 1) + '</div><div class="ic"><span class="halo"></span>' + upIcon(id, nx) + '</div><div class="rb">' + rb + '</div><div class="n">' + (u.kind === 'u' ? uName(id, nx) : wp ? (up && t0 < 2 && t1 >= 2 && !run.path[id] ? TN[id][1] + ' 진화' : tn(id, t1)) : u.name) + '</div><div class="pips">' + pips + '</div><div class="st">' + st + '</div>' + tail;
       b.addEventListener('click', () => pick(i));
       box.appendChild(b);
