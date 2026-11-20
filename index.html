@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>좀비대탈출 - 서울 좀비 생존 게임</title>
-<meta name="description" content="동료를 구하고 3분 뒤 첫차까지 버텨라! 설치 없이 바로 하는 서울 배경 좀비 생존 게임. 장소별 미션, 용병, 랭킹에 도전하세요.">
+<meta name="description" content="동료를 구하고 2분 30초 뒤 첫차까지 버텨라! 설치 없이 바로 하는 서울 배경 좀비 생존 게임. 장소별 미션, 용병, 랭킹에 도전하세요.">
 <meta name="keywords" content="좀비대탈출, 좀비게임, 무료게임, 웹게임, 브라우저게임, 생존게임, 서바이벌, 뱀서라이크">
 <link rel="canonical" href="https://zombie.jj365.kr/">
 <meta property="og:type" content="website">
@@ -12,14 +12,14 @@
 <meta property="og:locale" content="ko_KR">
 <meta property="og:url" content="https://zombie.jj365.kr/">
 <meta property="og:title" content="좀비대탈출 - 서울 좀비 생존 게임">
-<meta property="og:description" content="동료를 구하고 3분 뒤 첫차까지 버텨라! 설치 없이 바로 플레이 · 랭킹 도전">
+<meta property="og:description" content="동료를 구하고 2분 30초 뒤 첫차까지 버텨라! 설치 없이 바로 플레이 · 랭킹 도전">
 <meta property="og:image" content="https://zombie.jj365.kr/og.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="좀비대탈출 - 좀비 떼 사이에서 버티는 생존자들">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="좀비대탈출 - 서울 좀비 생존 게임">
-<meta name="twitter:description" content="동료를 구하고 3분 뒤 첫차까지 버텨라!">
+<meta name="twitter:description" content="동료를 구하고 2분 30초 뒤 첫차까지 버텨라!">
 <meta name="twitter:image" content="https://zombie.jj365.kr/og.jpg?v=2">
 <meta name="theme-color" content="#05060e">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -348,7 +348,7 @@
     <div id="xpbar"><i></i></div>
     <div id="topbar">
       <div><div id="me"><canvas id="face" width="92" height="92"></canvas><div id="meR"><div id="lv">LV 1</div><div id="hpbar"><i></i><div id="hptext"></div></div></div></div><div id="goldL"><svg class="gc" viewBox="0 0 20 20" width="1em" height="1em" style="vertical-align:-0.15em"><circle cx="10" cy="10" r="9" fill="#b8770a"/><circle cx="10" cy="9.2" r="8.2" fill="#ffc933"/><circle cx="10" cy="9.2" r="6" fill="#ffdf6b" stroke="#d6940f" stroke-width="1"/><path d="M12.6 7.2a3 3 0 1 0 .3 3.6h-2.6" fill="none" stroke="#a86a00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.2 6.2a6 6 0 0 1 3-2.6" fill="none" stroke="#fff6c9" stroke-width="1.2" stroke-linecap="round"/></svg> <b id="earnNow">0</b> 골드</div></div>
-      <div><div id="time">0:00</div><div id="goal">3분 뒤 최종 보스 등장</div></div>
+      <div><div id="time">0:00</div><div id="goal">30초마다 보스 · 2분 30초 최종 보스</div></div>
       <div id="right"></div>
     </div>
     <div id="owned"></div>
@@ -376,7 +376,7 @@
   <div id="menu" class="panel">
     <div class="box menuBox">
       <h1>좀비대탈출</h1>
-      <p class="orn">서울 좀비 생존기 · 동료를 구하고 3분 뒤 첫차까지 버티세요</p>
+      <p class="orn">서울 좀비 생존기 · 동료를 구하고 2분 30초 뒤 첫차까지 버티세요</p>
       <div id="show">
         <canvas id="showCv" width="1280" height="470"></canvas>
         <div id="showStage"></div>
@@ -436,7 +436,7 @@
   const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
   const fmt = (t) => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
   const MAX_EN = 190;
-  const WIN_TIME = 180, FINAL_HP = 40500, DK = 300 / 180, RESCUE_T = 150;
+  const WIN_TIME = 150, FINAL_HP = 40500, DK = 300 / 180, RESCUE_T = 120;
 
   // ---------- 화면 ----------
   let cw = 1, ch = 1, dpr = 1, zoom = 1, VW = 1, VH = 1, ECO = false;
@@ -1721,7 +1721,7 @@
   function newRun() {
     const chr = CHARS.find((c) => c.id === meta.sel.char) || CHARS[0], st0 = STAGES.find((s) => s.id === meta.sel.stage) || STAGES[0], sub = curSub(st0.id), st = Object.assign({}, st0, { xpMul: Math.pow(st0.hpMul, 0.08) });
     run = { t: 0, kills: 0, bossKills: 0, lvl: 1, xp: 0, xpNext: 10, up: { [chr.start]: 1 },
-            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 45, bossLvl: 0, won: false,
+            cd: { bolt: 0.3, pulse: 1.5, zap: 1, ember: 0, blade: 0.4, boomer: 0.8, ice: 0.5, meteor: 1.2, shur: 0.6, flask: 0.9, beam: 0.7, tornado: 1, sword: 0.5, arrow: 0.3, rain: 1, hell: 0.8 }, minions: [], lives: (chr.id === 'keeper' ? 1 : 0) + (ITM('revive') > 0 ? 1 : 0), kit: ITM('revive') > 0, awake: {}, path: {}, evoQ: [], later: [], flasks: [], tornados: [], evT: 12, eliteT: 15, moon: 0, lastEv: '', finalT: null, final: null, clearT: null, meteors: [], items: [], itemT: 6, freeze: 0, rage: 0, bonus: 0, orbitA: 0, spawnT: 0.5, nextBoss: 30, bossLvl: 0, won: false,
             ch: chr, st, rerolls: ITM('reroll'), face: 1, moveT: 0, moving: false,
             pets: { bug: { x: 0, y: -30, target: null }, owl: { x: -20, y: -34, cd: 1, target: null }, cat: { x: -22, y: 8, cd: 10, face: 1 }, dragon: { x: 20, y: -30, cd: 1.5, face: 1 } } };
     const hp = chr.hp + meta.up.hp * 10 + SV('m_kal');
@@ -1786,7 +1786,7 @@
     const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5 * (1 + 0.22 * ((run.st.dl || 1) - 1))) * Math.pow(run.st.hpMul, 0.5 + 0.5 * Math.min(1, t / 200));
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
-    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss * (lvl >= 2 ? 1.3 : 0.7) : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
+    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss * (lvl >= 2 ? 0.75 : 0.4) : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
     const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * Math.pow(run.st.dmgMul || 1, 0.5 + 0.5 * Math.min(1, t / 200)) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
@@ -2390,7 +2390,7 @@
   function checkLevel() {
     while (state === 'play' && run.xp >= run.xpNext) {
       run.xp -= run.xpNext; run.lvl++;
-      run.xpNext = Math.floor(8 + run.lvl * 6 + run.lvl * run.lvl * 1.1);
+      run.xpNext = Math.floor(8 + run.lvl * 5 + run.lvl * run.lvl * 1.6);
       fx.push({ k: 'pillar', x: player.x, y: player.y, w: 56, t: 0, life: 0.6, col: '255,228,160' }); burst(player.x, player.y, 14, '#ffe08a', 170);
       beep(520, 0.1, 'triangle', 0.05, 780); setTimeout(() => beep(780, 0.14, 'triangle', 0.05, 1170), 90);
       if (offerChoices()) break;
@@ -3222,7 +3222,7 @@
       run.spawnT = Math.max(0.25, 0.6 - td * 0.0012) * (td < 25 ? 0.8 : 1) * [1, 1.2, 1.08, 1, 0.95, 0.9, 0.85][run.st.dl || 1];
     }
     if (run.t >= run.nextBoss && run.t < WIN_TIME - 12) {
-      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 45;
+      run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 30;
       banner('⚠ ' + BOSS_NAMES[Math.min(3, run.bossLvl - 1)] + ' 등장'); beep(110, 0.6, 'sawtooth', 0.06, 220); shake = 8;
     }
     // 정예, 돌발 사건, 최종 보스
