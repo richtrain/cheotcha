@@ -849,7 +849,7 @@
       c.pw = b[2] / shown * Math.sqrt(b[0] / c.hp); c.dmg = shown; } }
   const TRAITS = { bite: ['🦷 맹공', '좀비 공격력 +55%', '체력·갑옷·비타민을 챙기세요'], iron: ['🛡️ 철갑', '좀비가 받는 피해 -58% · 치명타는 철갑을 뚫어요', '근력 운동·급소 노리기 한 단계마다 철갑 12% 관통'], horde: ['🧟 떼거리', '빠른 좀비가 1.5배 몰려와요(대신 조금 약하고 통조림이 적어요)', '반려동물이 큰 도움이 돼요'], scatter: ['📦 흩어진 보급', '통조림이 8초 뒤 사라지고 줍는 범위 -40%', '자석 집게(+3초)·배달 드론(+2초)이 통조림을 오래 남게 해요'], beast: ['🐾 동물의 밤', '반려동물 피해 +80% · 내 공격 피해 -15%', '반려동물을 꼭 데려가세요'] };
   const STRAIT = { forest: ['horde'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], mall: ['scatter', 'bite'], stadium: ['beast', 'iron'], bridge: ['bite', 'horde'], gwang: ['horde', 'iron'], end: ['iron', 'bite'] };
-  const DIFF = { hp: 1.35, dmg: 1.3, boss: 2.2 };   // 전체 난이도
+  const DIFF = { hp: 1.6, dmg: 1.35, boss: 2.2 };   // 전체 난이도
   const TR = (k) => !!(run && run.st && STRAIT[run.st.id] && STRAIT[run.st.id].includes(k));
   const GPRICE = [0, 2000, 5000, 10000, 30000, 100000]; for (const c of CHARS) if (c.price) c.price = GPRICE[c.g];
   const HERO = {
@@ -1776,7 +1776,7 @@
     const hm = (1 + (t / 60) * 1.0 + Math.pow(t / 60, 2) * 0.5) * run.st.hpMul;
     if (x === undefined) { const a = rand(0, TAU), d = Math.hypot(VW, VH) / 2 + 60; x = player.x + Math.cos(a) * d; y = player.y + Math.sin(a) * d; }
     const gp = run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1;
-    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
+    const hp = gp * (type === 'boss' ? T.hp * 3 * Math.pow(lvl, 1.35) * run.st.hpMul * (1 + t / 50) * 0.85 * DIFF.boss : T.hp * hm) * 0.98 * DIFF.hp;   // 최종 보스는 따로 정함
     const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * (run.st.dmgMul || 1) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
@@ -2479,7 +2479,7 @@
       if (!P.filled && (pd < 820 || run.t > 45)) { // 창고 안을 좀비로 채우고 간수·자물쇠 배치
         P.filled = true; const td = run.t * DK;
         for (let i = 0; i < 30; i++) { const e = spawn(pickType(td), P.cx + rand(-P.W + 30, P.W - 30), P.cy + rand(-P.H + 50, P.H - 26)); e.keep = true; e.jail = true; e.fast = false; }
-        const g = spawn('boss', P.cx, P.cy + 10, run.bossLvl + 1); g.guard = true; g.keep = true; g.jail = true; g.hp = g.maxHp = g.hp * 2; A.guard = g;
+        const g = spawn('boss', P.cx, P.cy + 10, run.bossLvl + 1); g.guard = true; g.keep = true; g.jail = true; g.hp = g.maxHp = g.hp * 2.6; A.guard = g;
         const L = spawn('brute', P.cx, P.cy + P.H); L.lock = true; L.keep = true; L.fast = false; L.speed = 0; L.dmg = 0; L.r = 16; L.hp = L.maxHp = 900 * (1 + td / 60) * run.st.hpMul; L.xp = 12; P.lock = L;
         if (pd < 820) { banner('⚠ 좀비로 가득 찬 창고다!'); beep(110, 0.6, 'sawtooth', 0.06, 220); shake = 6; }
       }
@@ -3230,7 +3230,7 @@
       if (Math.floor(p0 / 0.55) !== Math.floor(run.finalT / 0.55)) { beep(196, 0.42, 'sawtooth', 0.08, 98); shake = Math.max(shake, 6); }
       if (run.finalT >= 3.3) {
         const e = spawn('boss', player.x, player.y - VH / 2 - 70, 5);
-        e.final = true; e.r = run.sub < 5 ? 44 : 52; e.hp = e.maxHp = FINAL_HP * DIFF.boss * run.st.hpMul * (run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1) * (run.sub < 5 ? 0.5 + 0.1 * run.sub : 1); if (run.sub < 5) e.lvl = 2 + Math.ceil(run.sub / 2); e.speed *= 1.1; e.st = 0; run.final = e;
+        e.final = true; e.r = run.sub < 5 ? 44 : 52; e.hp = e.maxHp = FINAL_HP * DIFF.boss * DIFF.hp * run.st.hpMul * (run.st.minG && run.ch.g < run.st.minG ? 1.6 : 1) * (run.sub < 5 ? 0.5 + 0.1 * run.sub : 1); if (run.sub < 5) e.lvl = 2 + Math.ceil(run.sub / 2); e.speed *= 1.1; e.st = 0; run.final = e;
         banner('☠ ' + run.finName + ' ☠'); shake = 18; beep(70, 1.2, 'sawtooth', 0.09, 35);
       }
     }
