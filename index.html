@@ -831,7 +831,7 @@
       c.hp = Math.round(L2(HPB[gr], ph)); c.spd = +L2(SPB2[gr], ps).toFixed(2); const shown = +L2(ATB[gr], 1 - 0.8 * ph).toFixed(2);
       c.pw = b[2] / shown * Math.sqrt(b[0] / c.hp); c.dmg = shown; } }
   const TRAITS = { bite: ['🦷 맹공', '좀비 공격력 +55%', '체력·갑옷·비타민을 챙기세요'], iron: ['🛡️ 철갑', '좀비가 받는 피해 -58% · 치명타는 철갑을 뚫어요', '근력 운동·급소 노리기 한 단계마다 철갑 12% 관통'], horde: ['🧟 떼거리', '빠른 좀비가 1.5배 몰려와요(대신 조금 약하고 통조림이 적어요)', '반려동물이 큰 도움이 돼요'], scatter: ['📦 흩어진 보급', '통조림이 8초 뒤 사라지고 줍는 범위 -40%', '자석 집게(+3초)·배달 드론(+2초)이 통조림을 오래 남게 해요'], beast: ['🐾 동물의 밤', '반려동물 피해 +80% · 내 공격 피해 -15%', '반려동물을 꼭 데려가세요'] };
-  const STRAIT = { forest: ['horde'], grave: ['iron'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], bridge: ['bite'], end: ['iron', 'bite'] };
+  const STRAIT = { forest: ['horde'], ice: ['scatter'], lava: ['bite'], abyss: ['beast'], hosp: ['iron'], park: ['horde'], base: ['bite'], tunnel: ['beast'], tower: ['scatter'], depot: ['iron'], metro: ['horde'], mall: ['scatter', 'bite'], stadium: ['beast', 'iron'], bridge: ['bite', 'horde'], gwang: ['horde', 'iron'], end: ['iron', 'bite'] };
   const DIFF = { hp: 1.15, dmg: 1.2 };   // 전체 난이도
   const TR = (k) => !!(run && run.st && STRAIT[run.st.id] && STRAIT[run.st.id].includes(k));
   const GPRICE = [0, 2000, 5000, 10000, 30000, 100000]; for (const c of CHARS) if (c.price) c.price = GPRICE[c.g];
@@ -983,6 +983,9 @@
     tintIf('screamer', 'medic', 'hue-rotate(110deg) saturate(1.3)'); tintIf('leaper', 'clown', 'hue-rotate(250deg) saturate(1.6)'); tintIf('shield', 'soldier', 'hue-rotate(60deg) saturate(1.2)'); tintIf('brute', 'giant', 'hue-rotate(200deg) brightness(.85)');
     for (const [a, b, f] of [['grave', 'hosp', 'hue-rotate(110deg) saturate(.8)'], ['forest', 'park', 'hue-rotate(250deg) saturate(1.1)'], ['ice', 'base', 'hue-rotate(160deg) saturate(.6) brightness(.9)'], ['abyss', 'tunnel', 'hue-rotate(200deg) saturate(.5) brightness(.8)'], ['hosp', 'tower', 'hue-rotate(60deg) saturate(1.1)'], ['base', 'depot', 'hue-rotate(300deg) saturate(1.3)'], ['tunnel', 'metro', 'hue-rotate(40deg) saturate(1.2) brightness(1.1)'], ['ice', 'bridge', 'hue-rotate(10deg) saturate(.7) brightness(.75)'], ['depot', 'end', 'hue-rotate(320deg) saturate(1.5) brightness(.8)']]) if (ART.g[a] && !ART.g[b]) { const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'); g.filter = f; g.drawImage(ART.g[a], 0, 0); ART.g[b] = c; }
     if (ART.g.lava && !ART.g.abyss) { const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'); g.filter = 'hue-rotate(250deg) saturate(.9) brightness(.85)'; g.drawImage(ART.g.lava, 0, 0); ART.g.abyss = c; }
+    for (const [a, b, f] of [['tower', 'mall', 'hue-rotate(250deg) saturate(1.3)'], ['park', 'stadium', 'hue-rotate(110deg) saturate(1.1)'], ['base', 'gwang', 'hue-rotate(330deg) saturate(1.4) brightness(.85)']]) if (ART.g[a] && !ART.g[b]) { const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d'); g.filter = f; g.drawImage(ART.g[a], 0, 0); ART.g[b] = c; }
+    for (const [a, b, f] of [['fin_tower', 'fin_mall', 'hue-rotate(250deg) saturate(1.3)'], ['fin_park', 'fin_stadium', 'hue-rotate(110deg) saturate(1.2)'], ['fin_base', 'fin_gwang', 'hue-rotate(330deg) saturate(1.6) brightness(.9)']]) { tintIf(a, b, f); if (ART.fk && ART.fk[a] && !ART.fk[b]) { for (const k of ['w0', 'w1', 'w2', 'w3', 'a0', 'a1', 'a2', 'a3', 'd0', 'd1', 'd2', 'd3', 's0', 's1', 's2', 's3', 'n0', 'n1', 'n2', 'n3']) tintIf(a + '_' + k, b + '_' + k, f); ART.fk[b] = ART.fk[a]; if (ART.fk[a + 'v']) ART.fk[b + 'v'] = ART.fk[a + 'v']; } }
+    tintIf('spitter', 'shock', 'hue-rotate(160deg) saturate(1.8) brightness(1.15)'); tintIf('brute', 'slugger', 'hue-rotate(35deg) saturate(1.5)'); tintIf('screamer', 'drummer', 'hue-rotate(25deg) saturate(1.6) brightness(.9)');
     tint('wisp', 'goldwisp', 'sepia(1) saturate(5) hue-rotate(-12deg) brightness(1.25)');
     const glow = (src, dst, col, f) => {
       const s0 = ART.s[src]; if (!s0 || ART.s[dst]) return; const n = f ? 3 : 2, w = s0.width, h = s0.height, P = 30, c = document.createElement('canvas'); c.width = w + P * 2; c.height = h + P * 2; const g = c.getContext('2d');
@@ -1099,11 +1102,13 @@
   Object.assign(STAGE_PROPS, { hosp: ['pillar', 'coffin', 'lamp', 'boulder', 'crystal'], park: ['lamp', 'lamp', 'bush', 'oak', 'pillar', 'stump'], base: ['boulder', 'boulder', 'pillar', 'deadtree', 'icespike'] });
   Object.assign(TYPES, { medic: { r: 12, hp: 40, speed: 46, dmg: 8, xp: 5, col: '#8dffb0', dark: '#1f5a3a' }, clown: { r: 13, hp: 46, speed: 64, dmg: 14, xp: 4, col: '#ff8ad0', dark: '#6a1f5a' }, soldier: { r: 13, hp: 60, speed: 50, dmg: 13, xp: 5, col: '#a8b878', dark: '#3a4420' }, giant: { r: 26, hp: 420, speed: 30, dmg: 26, xp: 14, col: '#9a8a7a', dark: '#3a2a20' } });
   // 장소 난이도: [적 체력, 적 공격력, 통조림 배율, 등급, 권장]
-  const STIER = { nam: [1, 1, 1, 0], forest: [1.15, 1, 1.2, 0], grave: [1.4, 1.05, 1.5, 1], ice: [1.75, 1.1, 2, 1], lava: [2.2, 1.18, 2.5, 1], abyss: [2.9, 1.27, 3.2, 2], hosp: [3.8, 1.37, 4, 2],
-    park: [5, 1.48, 5, 2], base: [6.5, 1.6, 6, 3], tunnel: [8.4, 1.75, 7.5, 3], tower: [10.8, 1.92, 9, 4], depot: [14, 2.12, 11, 4], metro: [18, 2.35, 13, 4], bridge: [19, 2.6, 20, 5], end: [28, 3.0, 30, 6] };
+  // 장소 난이도: [적 체력, 적 공격력, 통조림 배율, 단계(1~5 별, 6 빨간 별)]
+  const STIER = { nam: [1, 1, 1, 1], forest: [1.15, 1, 1.2, 1], grave: [1.35, 1.05, 1.4, 1], ice: [1.7, 1.1, 1.8, 2], lava: [2.1, 1.17, 2.3, 2], abyss: [2.6, 1.25, 2.8, 2],
+    hosp: [3.3, 1.33, 3.5, 3], park: [4.2, 1.42, 4.3, 3], base: [5.3, 1.52, 5.2, 3], tunnel: [6.7, 1.64, 6.3, 4], tower: [8.4, 1.77, 7.6, 4], depot: [10.5, 1.9, 9, 4],
+    metro: [12.5, 2.02, 10.5, 5], mall: [14.5, 2.14, 12, 5], stadium: [16.5, 2.27, 14, 5], bridge: [19, 2.5, 18, 6], gwang: [23, 2.75, 23, 6], end: [28, 3.0, 30, 6] };
   const DLAB = [['쉬움', '#8dffb0', ''], ['보통', '#bfe8ff', ''], ['어려움', '#ffd27a', '전설 이상 또는 용병 권장'], ['매우 어려움', '#ffa060', '용병·아이템 권장'], ['지옥', '#ff6a5a', '신화 이상 · 용병 · 아이템 권장'], ['극악', '#ff3a7a', '신화 미만은 좀비가 1.6배 더 강해요 · 용병 풀강화와 아이템 필수'], ['극악 ☠', '#ff2a4a', '히든 캐릭터가 아니면 좀비가 1.6배 더 강해요 · 용병 풀강화 · 재건 · 아이템 전부 필요']];
-  const SDN = (st) => [1, 2, 3, 4, 4, 5, 5][st.dl || 0], SDL = ['쉬움', '보통', '다소 어려움', '어려움', '극악'];
-  const SSTAR = (st) => { const n = SDN(st); return n >= 5 ? '<span style="color:#ff3448;text-shadow:0 0 6px rgba(255,40,60,.7)">★★★★★</span>' : '<span style="color:#ffd24a">' + '★'.repeat(n) + '</span><span style="color:rgba(255,255,255,.22)">' + '★'.repeat(5 - n) + '</span>'; };
+  const SDN = (st) => Math.min(5, st.dl || 1), SDL = ['쉬움', '보통', '다소 어려움', '어려움', '지옥', '극악'];
+  const SSTAR = (st) => { const n = SDN(st); return (st.dl || 1) >= 6 ? '<span style="color:#ff3448;text-shadow:0 0 6px rgba(255,40,60,.7)">★★★★★</span>' : '<span style="color:#ffd24a">' + '★'.repeat(n) + '</span><span style="color:rgba(255,255,255,.22)">' + '★'.repeat(5 - n) + '</span>'; };
   STAGES.unshift({ id: 'nam', name: '남대문시장', desc: '스카프리오의 시장 · 기본 난이도', hpMul: 1, coinMul: 1, early: 0, unlock: null, fin: '시장 상인회장 좀비', bg: [30, 22, 18], patch: '150,90,60', amb: '255,190,120', sw: 'linear-gradient(160deg,#5a3424,#160c08 70%)' });
   // 조합: 무기 Lv5 + 짝이 되는 능력 Lv3
   const COMBO = { bolt: ['might', '강속구'], zap: ['haste', '과전류'], ember: ['vital', '사골 기름'], blade: ['might', '4번 타자'], boomer: ['swift', '회전 돌풍'], ice: ['regen', '냉찜질'], meteor: ['luck', '날벼락'], shur: ['crit', '마세 샷'], flask: ['might', '고농축 연료'], beam: ['crit', '헤드샷'], tornado: ['pull', '진공청소기'], summon: ['vital', '영양 주사'], sword: ['swift', '발도술'], arrow: ['crit', '엑스텐'], hell: ['regen', '공생'], cart: ['swift', '과속 카트'], spray: ['haste', '무한 분사'], kick: ['haste', '터보 모드'], ev: ['haste', '급속 충전'], oil: ['vital', '든든한 조림'], hwatu: ['luck', '삼팔광땡'] };
@@ -1510,7 +1515,7 @@
     $('showInfo').innerHTML = '<div class="gr" style="color:' + GCOL[ch.g] + '">' + GSTAR(ch) + ' ' + GRADE[ch.g] + '</div><div class="nm">' + ch.name + '</div><div class="tt">' + ch.title + (ch.style ? ' · <b style="color:#8fe9ff">' + ch.style + '</b>' : '') + '</div><div class="lore">“' + ch.lore + '”</div>' + (UQ[ch.id] ? '<div class="sig"><b>고유 스킬</b> ' + tn(ch.start, 0, false) + ' · ' + UQ[ch.id].map((q) => q[1][0] + ' ' + q[2][0]).join(' · ') + '</div>' : '') + '<div class="bars"><span>체력</span>' + bar(ch.hp / 240)
       + '<span>공격</span>' + bar(ch.dmg / 2.3) + '<span>속도</span>' + bar((ch.spd - 0.75) / 0.52) + '</div>';
     const sbest = ms.best[stg.id];
-    $('showStage').innerHTML = '<div class="rec" style="font-weight:800;font-size:14px">' + SSTAR(stg) + ' <span style="color:' + (SDN(stg) >= 5 ? '#ff5a6a' : '#e8dcc0') + '">' + SDL[SDN(stg) - 1] + '</span></div>' + (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span>' + (sbest ? '<div class="rec">최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' · 클리어' : '') + '</div>' : '');
+    $('showStage').innerHTML = '<div class="rec" style="font-weight:800;font-size:14px">' + SSTAR(stg) + ' <span style="color:' + ((stg.dl || 1) >= 6 ? '#ff5a6a' : '#e8dcc0') + '">' + SDL[(stg.dl || 1) - 1] + '</span></div>' + (STRAIT[stg.id] ? '<div class="rec" style="color:#ffd27a">' + STRAIT[stg.id].map((k) => TRAITS[k][0] + ' · ' + TRAITS[k][1] + ' → ' + TRAITS[k][2]).join('<br>') + '</div>' : '') + '<span class="tag">' + stCode(stg.id) + '. ' + stg.name + '</span>' + (sbest ? '<div class="rec">최고 ' + fmt(sbest) + (ms.wins[stg.id] ? ' · 클리어' : '') + '</div>' : '');
     $('wlab').innerHTML = '시작 무기 <b>' + tn(ch.start, 0, false) + '</b> → ' + tn(ch.start, 3, false);
     $('wroad').innerHTML = [0, 1, 2, 3].map((k) => '<span title="' + TN[ch.start][k] + '">' + tierIcon(ch.start, k) + '</span>').join('<em>›</em>');
     const cb = $('chars'); cb.innerHTML = '';
@@ -1724,10 +1729,24 @@
     const e = { type, x, y, r: T.r + (type === 'boss' ? lvl * 2 : 0), hp, maxHp: hp, speed: T.speed * (1 + Math.min(0.4, t / 700)) * (type === 'boss' ? 1 : (Math.random() < 0.15 ? rand(1.1, 1.25) : rand(0.72, 1.02))), dmg: T.dmg * (1 + t / 170) * (run.st.dmgMul || 1) * DIFF.dmg * gp, xp: T.xp * (lvl || 1),
       kx: 0, ky: 0, ux: 0, uy: 1, flash: 0, orbCd: 0, patchCd: 0, wob: rand(0, TAU), dead: false, cd: rand(1, 2.5), cast: 0, st: 0, stT: 0, ax: 0, ay: 0, lvl: lvl || 0 };
     if (type === 'boss') { e.burstT = 2.5; e.slamT = 4; e.sumT = 6; }
-    else if (type !== 'giant' && SDN(run.st) >= 3 && t > 110 && Math.random() < Math.min(0.28, (t - 110) / 560)) { e.fast = true; e.speed = Math.min(e.speed * 1.6, 178); }
+    else if (type !== 'giant' && (run.st.dl || 1) >= 3 && t > 130 - 12 * (run.st.dl || 1) && Math.random() < Math.min([0, 0, 0, 0.1, 0.17, 0.24, 0.32][run.st.dl || 1], (t - 60) / 560)) { e.fast = true; e.speed = Math.min(e.speed * 1.6, 178); }
     enemies.push(e); return e;
   }
-  for (const st of STAGES) { const q = STIER[st.id]; if (!q) continue; st.hpMul = q[0]; st.dmgMul = q[1]; st.coinMul = q[2]; st.dl = q[3]; if (st.id === 'bridge') st.minG = 4; if (st.id === 'end') st.minG = 5; st.desc = st.desc.replace(/적 체력 \+\d+%(, 통조림 \+\d+%)?/, '적 체력 +' + Math.round((q[0] - 1) * 100) + '% · 공격력 +' + Math.round((q[1] - 1) * 100) + '%').replace(' · 신화 미만 캐릭터는 적 체력 +60% 더', ''); }
+  // ---------- 새 장소 3곳 ----------
+  if (!STAGES.find((x) => x.id === 'mall')) {
+    const NEW = {
+      mall: { id: 'mall', name: '용산 전자상가', desc: '고장 난 전광판 아래 · 죽으면 감전시키는 좀비', hpMul: 12, dmgMul: 2, coinMul: 12, early: 162, mob: 'shock', giant: true, unlock: { k: 'win', stage: 'metro', id: 'mall', text: '지하철 환승역 클리어' }, fin: '전광판의 지배자', bg: [18, 14, 30], patch: '120,80,200', amb: '200,170,255', sw: 'linear-gradient(160deg,#3a2466,#0c0818 70%)' },
+      stadium: { id: 'stadium', name: '잠실 야구장', desc: '9회 말 · 방망이를 휘두르는 강타자 좀비', hpMul: 14, dmgMul: 2.1, coinMul: 14, early: 164, mob: 'slugger', giant: true, unlock: { k: 'win', stage: 'mall', id: 'stadium', text: '용산 전자상가 클리어' }, fin: '9회 말의 강타자', bg: [14, 28, 18], patch: '70,150,90', amb: '190,255,200', sw: 'linear-gradient(160deg,#1f4a2a,#08140a 70%)' },
+      gwang: { id: 'gwang', name: '광화문 광장', desc: '북소리에 흥분한 좀비 떼', hpMul: 20, dmgMul: 2.6, coinMul: 22, early: 168, mob: 'drummer', ext: ['shock', 'slugger'], giant: true, unlock: { k: 'win', stage: 'bridge', id: 'gwang', text: '한강 다리 위 클리어' }, fin: '광장의 거신', bg: [30, 16, 14], patch: '180,80,60', amb: '255,180,150', sw: 'linear-gradient(160deg,#5a2418,#160806 70%)' } };
+    STAGES.splice(STAGES.findIndex((x) => x.id === 'metro') + 1, 0, NEW.mall, NEW.stadium);
+    STAGES.splice(STAGES.findIndex((x) => x.id === 'bridge') + 1, 0, NEW.gwang);
+    const br = STAGES.find((x) => x.id === 'bridge'), en = STAGES.find((x) => x.id === 'end');
+    if (br) br.unlock = { k: 'win', stage: 'stadium', id: 'bridge', text: '잠실 야구장 클리어' };
+    if (en) { en.unlock = { k: 'win', stage: 'gwang', id: 'end', text: '광화문 광장 클리어' }; en.ext = ['shock', 'slugger', 'drummer']; }
+    Object.assign(STAGE_PROPS, { mall: STAGE_PROPS.tower || STAGE_PROPS.forest, stadium: STAGE_PROPS.park || STAGE_PROPS.forest, gwang: STAGE_PROPS.base || STAGE_PROPS.forest });
+    Object.assign(TYPES, { shock: { r: 12, hp: 34, speed: 56, dmg: 11, xp: 4, col: '#7fe8ff', dark: '#1a4a6a' }, slugger: { r: 17, hp: 120, speed: 60, dmg: 20, xp: 7, col: '#e0a050', dark: '#5a3010' }, drummer: { r: 13, hp: 60, speed: 44, dmg: 9, xp: 5, col: '#ff9a60', dark: '#6a2a10' } });
+  }
+  for (const st of STAGES) { const q = STIER[st.id]; if (!q) continue; st.hpMul = q[0]; st.dmgMul = q[1]; st.coinMul = q[2]; st.dl = q[3]; if (st.id === 'bridge' || st.id === 'gwang') st.minG = 4; if (st.id === 'end') st.minG = 5; st.desc = st.desc.replace(/적 체력 \+\d+%(, 통조림 \+\d+%)?/, '적 체력 +' + Math.round((q[0] - 1) * 100) + '% · 공격력 +' + Math.round((q[1] - 1) * 100) + '%').replace(' · 신화 미만 캐릭터는 적 체력 +60% 더', ''); }
   // 장소마다 좀비 구성이 달라요: [종류, 등장 시각, 기본 비중, 동시 최대]
   const MOBS = [['shade', 0, 0.24, 0], ['wisp', 25, 0.22, 0], ['bat', 35, 0.14, 0], ['skel', 0, 0.2, 0], ['frost', 0, 0.2, 0], ['crawler', 18, 0.05, 0], ['spitter', 50, 0.11, 8], ['brute', 70, 0.12, 0], ['charger', 95, 0.08, 5], ['bomber', 130, 0.09, 6], ['screamer', 65, 0.025, 2], ['leaper', 85, 0.04, 5], ['shield', 120, 0.035, 4]];
   const MIX = {
@@ -1750,6 +1769,7 @@
     const cn = {}; for (const e of enemies) cn[e.type] = (cn[e.type] || 0) + 1;
     const mix = MIX[run.st.id] || {}, r2 = Math.random();
     if (run.st.mob && !ban[run.st.mob] && r2 > 0.87 && (cn[run.st.mob] || 0) < 7) return run.st.mob;
+    if (run.st.ext && r2 < 0.07) { const k = run.st.ext[Math.floor(Math.random() * run.st.ext.length)]; if ((cn[k] || 0) < 5) return k; }
     if (run.st.giant && !ban.giant && run.t * DK > 40 && r2 > 0.845 && r2 <= 0.87 && (cn.giant || 0) < 3) return 'giant';
     let sum = 0; const c = [];
     for (const m of MOBS) {
@@ -2050,6 +2070,7 @@
       else if (boss) { run.bossKills++; hearts.push({ x: e.x, y: e.y, heal: 40 }); hearts.push({ x: e.x + 34, y: e.y + 6, chest: true }); for (let i = 0; i < 8; i++) gems.push({ x: e.x + rand(-40, 40), y: e.y + rand(-40, 40), v: 4, big: true, gone: false }); shake = 14; beep(160, 0.5, 'sawtooth', 0.07, 50); banner('우두머리 처치!'); ebullets = ebullets.filter((b) => !b.boss); }
       else if (Math.random() < 0.006) hearts.push({ x: e.x, y: e.y, heal: 25 });
       if ((e.type === 'shade' || e.type === 'skel' || e.type === 'frost') && !e.elite && enemies.length < 120 && Math.random() < 0.13) { const x = e.x, y = e.y; run.later.push({ t: 0.35, f: () => { const c = spawn('crawler', x, y); c.xp = 1; c.age = 0; } }); }
+      if (e.type === 'shock' && zones.length < 40) zones.push({ x: e.x, y: e.y, r: 64, t: 0, delay: 0.9, dmg: e.dmg * 1.3 });
       if (e.type === 'clown' && enemies.length < 120) { const x = e.x, y = e.y; run.later.push({ t: 0.2, f: () => { for (const k of [-1, 1]) { const c = spawn('wisp', x + k * 14, y); c.xp = 1; c.age = 0; } } }); }
       if (run.ch.id === 'witch' && Math.random() < 0.12) { const x = e.x, y = e.y; run.later.push({ t: 0.06, f: () => splash(x, y, 58, 16 * stat.dmg(), { kb: 60 }) }); }
       if (run.ch.id === 'necro' && e.type !== 'boss' && run.minions.length < 26 && Math.random() < 0.08) { run.minions.push(mkMinion('bone', e.x, e.y, 8)); burst(e.x, e.y, 8, '#9dffb0', 160); }
@@ -2071,6 +2092,11 @@
       if (e.hT <= 0) { e.hT = 3.5; for (const o of enemies) { if (o.dead || o === e || o.type === 'boss') continue; const mh = o.maxHp || TYPES[o.type].hp * 2; if (Math.hypot(o.x - e.x, o.y - e.y) < 150) { if (!o.maxHp) o.maxHp = Math.max(o.hp, 1); o.hp = Math.min(o.maxHp, o.hp + o.maxHp * 0.3); } } if (fx.length < 380) fx.push({ k: 'wave', x: e.x, y: e.y, R: 150, t: 0, life: 0.5, col: '120,255,160' }); }
       if (d < 170) { vx = -ux * e.speed; vy = -uy * e.speed; }
     }
+    if (e.type === 'slugger') { e.cd -= dt;
+      if (e.st === 1) { e.stT -= dt; vx = vy = 0; if (e.stT <= 0) { e.st = 0; e.cd = rand(2.4, 3.2); const hx = e.x + e.ax * 40, hy = e.y + e.ay * 40; shake = Math.max(shake, 4); if (fx.length < 380) fx.push({ k: 'blast', x: hx, y: hy, R: 70, t: 0, life: 0.3, col: '255,200,120' }); if (Math.hypot(player.x - hx, player.y - hy) < 70 + player.r) { hitPlayer(e.dmg * 1.4); player.x += e.ax * 60; player.y += e.ay * 60; } beep(140, 0.2, 'square', 0.05, 80); } }
+      else if (e.cd <= 0 && d < 95) { e.st = 1; e.stT = 0.55; e.ax = ux; e.ay = uy; } }
+    if (e.type === 'drummer') { if (d < 200) { vx = -ux * e.speed; vy = -uy * e.speed; } e.cd -= dt;
+      if (e.cd <= 0 && d < 480) { e.cd = rand(5.5, 7); for (const o of enemies) if (!o.dead && o !== e && o.type !== 'boss' && Math.hypot(o.x - e.x, o.y - e.y) < 260) o.rageT = Math.max(o.rageT || 0, 3); if (fx.length < 380) fx.push({ k: 'wave', x: e.x, y: e.y, R: 260, t: 0, life: 0.5, col: '255,150,90' }); if (nums.length < 60) nums.push({ x: e.x, y: e.y - 30, v: '둥! 둥!', t: -0.4, crit: true }); beep(90, 0.25, 'sine', 0.06, 70); } }
     if (e.type === 'charger') {
       e.cd -= dt;
       if (e.st === 1) { e.stT -= dt; vx = vy = 0; if (e.stT <= 0) { e.st = 2; e.stT = 0.5; beep(200, 0.2, 'sawtooth', 0.03, 500); } }
@@ -3119,7 +3145,7 @@
     if (run.spawnT <= 0 && enemies.length < (TR('horde') ? 175 : 140)) {
       const td = run.t * DK, batch = run.finalT !== null ? 3 : td < 25 ? 1 : td < 90 ? 2 : Math.min(5, 2 + Math.floor(td / 100));
       for (let i = 0; i < Math.round(batch * (TR('horde') ? 1.5 : 1)); i++) { const e = spawn(pickType(run.t * DK)); if (TR('horde') && e && e.type !== 'boss') { e.hp *= 0.72; e.maxHp = e.hp; e.xp *= 0.6; e.speed *= 1.12; } }
-      run.spawnT = Math.max(0.25, 0.6 - td * 0.0012) * (td < 25 ? 0.8 : 1);
+      run.spawnT = Math.max(0.25, 0.6 - td * 0.0012) * (td < 25 ? 0.8 : 1) * [1, 1.2, 1.08, 1, 0.95, 0.9, 0.85][run.st.dl || 1];
     }
     if (run.t >= run.nextBoss && run.t < WIN_TIME - 12) {
       run.bossLvl++; spawn('boss', undefined, undefined, run.bossLvl); run.nextBoss += 60;
@@ -3405,6 +3431,7 @@
   }
   const SPR_K = { medic: 3.9, clown: 3.9, soldier: 3.8, giant: 3.4, crawler: 2.7, screamer: 4.1, shield: 3.6, leaper: 3.1, shade: 3.9, wisp: 4.4, brute: 3.4, spitter: 3.8, charger: 3.4, bomber: 3.7, bat: 3.6, skel: 3.9, frost: 3.9, boss: 3.8 };
   const FLY = { bat: 1 };
+  Object.assign(SPR_K, { shock: 3.8, slugger: 3.4, drummer: 4.1 });
   let LOD = false;
   function walkBody(s, w, h, sw, K, heavy) {
     const sh = Math.round(s.height * 0.6), lh = h * (1 - sh / s.height), hw = s.width >> 1, bob = Math.abs(sw) * h * (heavy ? 0.03 : 0.055);
