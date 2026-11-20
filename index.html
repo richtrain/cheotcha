@@ -44,6 +44,22 @@
   #shareBtn { top: 56px; font-size: 13px; padding: 0 12px; height: 34px; color: #aef0ff; border-color: rgba(120,230,255,.45); }
   #rankBtn.hidden, #shareBtn.hidden { display: none; }
   @media (max-width: 860px) { #shareBtn { top: 12px; height: 38px; left: 106px; } .menuBox { padding-top: 40px; } }
+  #cutin { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; --c: 255,58,106; }
+  #cutin.show { display: flex; animation: ciBg var(--d, 1.25s) linear forwards; }
+  #cutin.big { background: radial-gradient(ellipse at center, rgba(0,0,0,.2), rgba(0,0,0,.78)); }
+  #cutin .band { position: absolute; left: -10%; right: -10%; top: 50%; height: 170px; transform: translateY(-50%) skewY(-4deg); background: linear-gradient(90deg, rgba(var(--c),0), rgba(var(--c),.42) 30%, rgba(var(--c),.42) 70%, rgba(var(--c),0)); animation: ciBand .35s ease-out both; }
+  #cutin.small .band { height: 90px; }
+  #cutin .hero { position: absolute; left: 6%; top: 50%; width: min(34vw, 190px); height: auto; transform: translateY(-58%); filter: drop-shadow(0 0 12px rgba(var(--c),.9)); animation: ciL .35s cubic-bezier(.2,.9,.3,1) both; }
+  #cutin .med { position: absolute; right: 7%; top: 50%; width: min(24vw, 120px); transform: translateY(-50%); animation: ciR .35s cubic-bezier(.2,.9,.3,1) both; } #cutin .med img { width: 100%; height: auto; filter: drop-shadow(0 0 14px rgba(var(--c),1)); }
+  #cutin .tx { position: relative; text-align: center; pointer-events: none; }
+  #cutin .sub { font-size: 14px; font-weight: 800; letter-spacing: 6px; color: rgb(var(--c)); text-shadow: 0 0 8px #000; animation: ciSub .3s ease-out both .1s; }
+  #cutin .nm { font-size: min(12vw, 66px); font-weight: 900; color: #fff; letter-spacing: 2px; white-space: nowrap; text-shadow: 0 0 22px rgba(var(--c),1), 0 0 6px rgba(var(--c),1), 0 4px 0 #000; animation: ciT .5s cubic-bezier(.2,1.7,.4,1) both .14s; }
+  #cutin.small .nm { font-size: min(9vw, 44px); }
+  @keyframes ciBg { 0% { opacity: 0; } 8% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes ciBand { from { transform: translateY(-50%) skewY(-4deg) scaleY(0); } }
+  @keyframes ciL { from { transform: translate(-170%, -58%); } } @keyframes ciR { from { transform: translate(170%, -50%) rotate(40deg); } }
+  @keyframes ciT { from { transform: scale(2.8); opacity: 0; } } @keyframes ciSub { from { opacity: 0; transform: translateY(8px); } }
+  @media (prefers-reduced-motion: reduce) { #cutin .band, #cutin .hero, #cutin .med, #cutin .nm, #cutin .sub { animation: none; } }
   #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); z-index: 60; padding: 10px 16px; border-radius: 12px; background: rgba(14,16,34,.94); border: 1px solid rgba(255,215,140,.45); color: #ffe9b8; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; white-space: nowrap; } #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .misHead { margin: 10px 4px 0; font-size: 13px; letter-spacing: 1px; color: #e8dcc0; } .misHead b { color: var(--warm); } .misHead em { font-style: normal; color: #9aa3b5; margin-left: 6px; font-size: 12px; }
   .card.merc .lk { font-size: 11px; color: #9aa3b5; }
@@ -344,6 +360,7 @@
   <button id="rankBtn" aria-label="랭킹">🏆 랭킹</button>
   <button id="shareBtn" aria-label="친구에게 공유하기">📤 친구 초대</button>
   <div id="toast"></div>
+  <div id="cutin"></div>
   <div id="callOv" class="hidden"><div class="cc"><canvas id="callCv" width="144" height="144"></canvas><div><div class="rd"><i></i>무전 수신 중…</div><div class="ln" id="callLn"></div><div class="hn" id="callHn"></div></div></div></div>
   <div id="pauseOv" class="panel over hidden">
     <div class="box">
@@ -1213,6 +1230,14 @@
   const EMO = new Map();
   function emoSpr(e) { let c = EMO.get(e); if (!c) { c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); g.font = '46px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 32, 35); EMO.set(e, c); } return c; }
   // 고유 스킬 발동. 대상이 없으면 false
+  let cutT = 0;
+  function cutIn(name, sub, col, medHtml, big) {
+    const el = $('cutin'); if (!el) return; el.className = ''; void el.offsetWidth; el.style.setProperty('--c', col); el.style.setProperty('--d', big ? '1.25s' : '0.8s');
+    el.innerHTML = '<div class="band"></div>' + (big ? '<canvas class="hero" width="200" height="200"></canvas><div class="med">' + medHtml + '</div>' : '') + '<div class="tx"><div class="sub">' + sub + '</div><div class="nm">' + name + '!</div></div>';
+    if (big) { try { const g = el.querySelector('.hero').getContext('2d'), hd0 = HD; g.translate(100, 152); g.scale(3.6, 3.6); HD = 'd'; drawHero(g, run.ch.id, 0, 0, 1, 0, false); HD = hd0; } catch (e) {} }
+    el.classList.add('show', big ? 'big' : 'small'); clearTimeout(cutT); cutT = setTimeout(() => { el.className = ''; el.innerHTML = ''; }, big ? 1250 : 800);
+    run.freeze = Math.max(run.freeze || 0, big ? 1.3 : 0.7); player.inv = Math.max(player.inv, big ? 2.2 : 1.4);
+  }
   function throwLean(tx, ty) { if (!run) return; const pn = run.pn = run.pn || []; if (pn.length >= 4) pn.shift(); pn.push({ a: Math.atan2(ty - player.y, tx - player.x), t: 0, side: 0, nopaw: true }); }
   function nyPunch(tx, ty) { if (!run || run.ch.id !== 'nyang') return; const pn = run.pn = run.pn || []; if (pn.length >= 4) pn.shift(); run.pnS = -(run.pnS || 1); pn.push({ a: Math.atan2(ty - player.y, tx - player.x), t: 0, side: run.pnS }); }
   function drawPaws(ox, oy) {
@@ -2212,11 +2237,12 @@
     if (id === 'vital') { player.maxHp += 45 * (now - was); player.hp = Math.min(player.maxHp, player.hp + 45 * (now - was)); }
     if (u.kind === 'u' && was < 3 && now >= 3) (run.ubrQ = run.ubrQ || []).push(id);
     if (u.kind === 'u' && was > 0 && UFAIL[now]) { const big = now === 7 ? 3 : now === 5 ? 2 : 1, col = LVRGB[now]; flashT = Math.max(flashT, 0.22 + 0.1 * big); shake = Math.max(shake, 6 + 4 * big); player.hp = Math.min(player.maxHp, player.hp + player.maxHp * (0.15 + 0.15 * big)); player.inv = Math.max(player.inv, 1 + 0.5 * big);
-      run.later.push({ t: 0.05, f: () => { splash(player.x, player.y, 180 + 70 * big, (30 + run.lvl * 4) * stat.dmg() * big, { kb: 420 + 120 * big, col, stun: 0.6 + 0.3 * big }); if (fx.length < 380) fx.push({ k: 'rays', x: player.x, y: player.y, R: 200 + 80 * big, t: 0, life: 0.7, n: 16 + 8 * big, col }); if (fx.length < 380) fx.push({ k: 'pillar', x: player.x, y: player.y, w: 80 + 40 * big, t: 0, life: 0.8, col }); } });
+      if (big >= 2) setTimeout(() => cutIn(uName(id, now), big === 3 ? '궁 극' : '각 성', col, '<img src="' + uIcon(id, now) + '" alt="">', big === 3), 120);
+      run.later.push({ t: big === 3 ? 1.2 : big === 2 ? 0.75 : 0.05, f: () => { splash(player.x, player.y, 180 + 70 * big, (30 + run.lvl * 4) * stat.dmg() * big, { kb: 420 + 120 * big, col, stun: 0.6 + 0.3 * big }); if (fx.length < 380) fx.push({ k: 'rays', x: player.x, y: player.y, R: 200 + 80 * big, t: 0, life: 0.7, n: 16 + 8 * big, col }); if (fx.length < 380) fx.push({ k: 'pillar', x: player.x, y: player.y, w: 80 + 40 * big, t: 0, life: 0.8, col }); } });
       beep(523, 0.15, 'triangle', 0.06); setTimeout(() => beep(659, 0.15, 'triangle', 0.06), 110); setTimeout(() => beep(784, 0.15, 'triangle', 0.06), 220); setTimeout(() => beep(1046 * (big >= 2 ? 1.26 : 1), 0.5, 'triangle', 0.07, 1568), 330); }
     if (u.kind === 'u' && was > 0 && now >= 7 && was < 7) { banner('✦ 궁극: ' + uName(id, now) + ' ✦'); burst(player.x, player.y, 34, '#ff3a6a', 320); shake = Math.max(shake, 6); } else if (u.kind === 'u' && was > 0 && uT(now) > uT(was)) { banner('✦ ' + (uT(now) === 2 ? '각성' : '진화') + ': ' + uName(id, now) + ' ✦'); burst(player.x, player.y, 24, uT(now) === 2 ? '#ff8ad8' : '#ffd25a', 260); }
     if (u.kind === 'pet' && was === 0) { const p = run.pets[id]; p.x = player.x; p.y = player.y - 20; }
-    if (TN[id] && was > 0) { const tb = tierOf(now), ta = tierOf(was); if (tb > ta) { if (ta < 2 && tb >= 2 && !run.path[id]) run.evoQ.push(id); else { banner('✦ ' + TLAB[tb] + ': ' + tn(id, tb) + ' ✦'); tierFx(id, tb); } if (ta < 4 && tb >= 4) (run.specQ = run.specQ || []).push({ id, k: 'spec' }); if (ta < 5 && tb >= 5) (run.specQ = run.specQ || []).push({ id, k: 'ult' }); } }
+    if (TN[id] && was > 0) { const tb = tierOf(now), ta = tierOf(was); if (tb > ta) { if (ta < 2 && tb >= 2 && !run.path[id]) run.evoQ.push(id); else { banner('✦ ' + TLAB[tb] + ': ' + tn(id, tb) + ' ✦'); tierFx(id, tb); if (tb >= 7) setTimeout(() => cutIn(tn(id, tb), '무 한', '255,58,106', upIcon(id, now), true), 120); } if (ta < 4 && tb >= 4) (run.specQ = run.specQ || []).push({ id, k: 'spec' }); if (ta < 5 && tb >= 5) (run.specQ = run.specQ || []).push({ id, k: 'ult' }); } }
     return now - was;
   }
   let spinning = false, fastSpin = false;
@@ -4154,6 +4180,7 @@ else if (f.k === 'rays') {
   loadArt(() => { if (state === 'menu') renderMenu(); const b = document.getElementById('boot'); if (b) setTimeout(() => { b.classList.add('off'); setTimeout(() => b.remove(), 600); }, 30); });
   let prev = performance.now(), hitStop = 0;
   let lastF = 0;
+  { const ce = $('cutin'); if (ce) ce.addEventListener('pointerdown', (e) => { e.stopPropagation(); clearTimeout(cutT); ce.className = ''; ce.innerHTML = ''; }); }
   function frame(now) {
     requestAnimationFrame(frame);
     // 게임 중이 아니면 1초에 20번, 절전 모드면 게임 중에도 30번만 그림
